@@ -6,3 +6,4 @@ The main objective fo this project is to use the blueprint to split the applicat
 1.1) the standard will be used by all the apps
 1.2) the others will be used for the tables etc
 
+2)
