@@ -1,0 +1,39 @@
+
+<!--  <div style="background:transparent !important" class="jumbotron jumbotron-fluid">-->
+
+      <table
+        id="table_tools"
+        data-toggle="table"
+        data-height="460"
+        data-click-to-select="true"
+        data-side-pagination="client">
+          <thead>
+            <tr>
+{#              <th  data-field="state" data-checkbox="true"></th>#}
+                {% if jsondata %}
+                    {% for column in jsondata['column_name'] %}
+                          <th data-field="{{column}}">{{column}}</th>
+                    {% endfor %}
+                {% endif %}
+            </tr>
+          </thead>
+          <tbody id = "table_extract">
+            {% if jsondata['tools']  %}
+                {% for item in jsondata['tools'] %}
+                <tr >
+{#                  tool_table_main.html#}
+                    {% for data in item %}
+
+{#                        {% if data in (jsondata['keys']) %}#}
+                     <td id = "{{ data }}" data-field="{{ data }}">{{ item[data] }}</td>
+{#                        {% else %}#}
+
+{#                        {% endif %}#}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            {% endif%}
+          </tbody>
+      </table>
+
+<!--  </div>-->

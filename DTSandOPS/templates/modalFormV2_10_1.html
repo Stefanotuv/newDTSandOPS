@@ -1,0 +1,127 @@
+
+
+         <div  id="modalTable" class="modal fade" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document" >
+            <div class="modal-content" style="width: 802px;" style="align:center">
+              <div class="modal-header">
+                <h5 class="modal-title">Modal table</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div >
+
+
+                  <table id="table_all_tools"
+                    data-toggle="table"
+                    data-sort-class="table-active"
+                    data-search="true"
+                    data-search-text=""
+                    data-total-field="count"
+                    data-data-field="items"
+
+                    data-height="350"
+                    class="table-dark"
+                    data-filter-control="true"
+                    data-filter-show-clear="true">
+                    <thead>
+                        <tr>
+                          <th data-field="state" data-checkbox="true"></th>
+                            {% if jsondata %}
+                                {% for column in jsondata['column_name'] %}
+                                      <th data-field="{{column}}">{{column}}</th>
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if jsondata['full_tools']  %}
+                            {% for item in jsondata['full_tools'] %}
+                            <tr>
+                              <td data-field="state" data-checkbox="true"></td>
+                                {% for data in item %}
+
+            {#                        {% if data in (jsondata['keys']) %}#}
+                                     <td data-field="{{ data }}">{{ item[data] }}</td>
+            {#                        {% else %}#}
+
+            {#                        {% endif %}#}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        {% endif%}
+                  </tbody>
+
+                </table>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button id = "button1" type="button" class="btn btn-secondary" >Select</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          var $table = $('#table_all_tools')
+          $(function() {
+            $('#modalTable').on('shown.bs.modal', function () {
+              $table.bootstrapTable('resetView')
+            })
+          })
+      </script>
+        <script>
+          var $table = $('#table_all_tools')
+          var $button1 = $('#button1')
+          var $user_name = $('#user_name')
+          var $table_extract = $('#table_extract')
+          var $newRows = ""
+          var $newRow = ""
+          var $allDataRow = ""
+          var $allDataRows = []
+
+          var $value = JSON.stringify($table.bootstrapTable('getSelections'))
+
+          $(function() {
+            $('#button1').click(function () {
+            debugger;
+            $newRows=[];
+            $allDataRows = [];
+            $selectedData_from_main_table = $('#table_tools').bootstrapTable('getData');
+            {#$selectedData_from_main_table = $('[id="\id\"]');#}
+            $selectedData = $('#table_all_tools').bootstrapTable('getSelections');
+
+            {#console.log($selectedData_from_main_table);#}
+
+            $.each($selectedData_from_main_table, function (index, value){
+                $allDataRow = $selectedData_from_main_table[index].tool_id;
+                $allDataRows.push($allDataRow);
+            });
+            console.log($allDataRows);
+
+
+            $.each($selectedData, function (index, value){
+
+                {#debugger;#}
+
+                if((jQuery.inArray(($selectedData[index].tool_id).toString(), $allDataRows) == -1)==false){
+                    console.log($newRows);
+                }
+                else{
+                    console.log($newRows);
+                    $newRows.push({'tool_id': $selectedData[index].tool_id, 'tool_name': $selectedData[index].tool_name, 'tool_vendor': $selectedData[index].tool_vendor});
+                }
+
+            });
+
+            {#debugger;#}
+            $('#table_tools').bootstrapTable('append', $newRows);
+
+            })
+          })
+        </script>
+
+
+<!--  </div>-->

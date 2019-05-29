@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    main page
+{% endblock %}
+
+{% block head %}
+    <link rel="icon" href="../static/image/favicon.ico" type="image/x-icon">
+
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="row flex-xl-nowrap">
+        <div class="col-lg-2 sidebar_left">
+
+            {% include "sidebar_search_tool_10_1.html" %}
+
+        </div>
+
+        <div class="col-lg-7 main" >
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTable">
+                          Add Tool(s) to the list
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% include "modalFormV2_10_1.html" %}
+
+            {% include "tools/tool_table_main_8.html" %}
+
+
+        </div>
+        <div class="col-lg-3 sidebar_right" >
+
+            {% include "sidebar_add_user_post_10_1.html" %}
+
+        </div>
+
+    </div>
+
+
+</div>
+<script>
+    $(window).on('load',function() {
+        $('#tableUsers').bootstrapTable({
+            formatLoadingMessage: function () {
+                return 'No user added';
+                }
+            });
+        });
+
+    var $table = $('#table_all_tools')
+        $(function() {
+            $('#modalTable').on('shown.bs.modal', function () {
+                $table.bootstrapTable('resetView')
+            })
+        })
+
+</script>
+
+
+
+
+
+
+
+{% endblock %}

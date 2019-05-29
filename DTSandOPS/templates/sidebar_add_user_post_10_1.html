@@ -1,0 +1,406 @@
+
+
+<!--<form action="../main_submit.html">-->
+
+    <div class="sidenav">
+        <!--<div class="col-md">-->
+{#        <form>#}
+{#            {{ form.csrf_token }}#}
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ user_form.user_name(id="user_name", class="form-control", placeholder="Name") }}
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ user_form.user_id(id="user_id", class="form-control", placeholder="User_ID") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {% if data in (jsondata['selected']) %}
+                                {{ user_form.country(id='country', class="form-control",  selected="selected") }}
+                            {% else %}
+                                {{ user_form.country(id='country',class="form-control") }}
+                            {% endif %}
+
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <input id="add_user" class="form-control btn btn-primary" type="submit" value="Add User">
+
+
+        <div class="form-group" style="margin-top: 12px;margin-bottom: 12px;">
+            <div class="form-field">
+                <div class="select-wrap">
+                    <div style = "font-size: 12px;">
+
+
+{#                    {% if json_user_table %}#}
+{#                    <table#}
+{#                        id="tableUsers"#}
+{#                        data-total-field='total'#}
+{#                        class="table table-bordered"#}
+{#                        data-click-to-select="true"#}
+{#                        data-height="200"#}
+{#                        load = {{ json_user_table }}>#}
+{#                        data-url="{{ json_user_table }}">#}
+{##}
+{#                    {% else %}#}
+
+                    <table
+                        id="tableUsers"
+                        data-total-field='total'
+                        class="table table-bordered"
+                        data-click-to-select="true"
+                        data-height="200">
+
+{#                    {% endif %}#}
+
+                          <thead style="padding: 0px;">
+                            <tr style="padding: 0px;">
+                                <th  data-field="state" data-checkbox="true" style="padding: 0px;"></th>
+                                <th style="padding: 0px;" data-field="user_id">user id</th>
+                                <th style="padding: 0px;" data-field="role">role</th>
+                                <th style="padding: 0px;" data-field="country">country</th>
+
+                            </tr>
+                          </thead>
+                          <tbody id = "table_user_selected">
+
+
+                          </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row flex-xl-nowrap">
+            <div class="col-lg-6">
+                <input id= "delete_button" class="form-control btn btn-danger" type="submit" value="Delete User(s)">
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="dropdown" id="toolbar">
+                  <button style="padding-left: 6px;padding-right: 6px;" class="btn btn-success dropdown" type="button" data-toggle="dropdown"  id="dropdownMenu2" value="Extract User(s)">
+                   Export Selected
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" >
+                    <button class="btn btn-success dropdown-item" type="button" value="Excel" id="Excel" >Excel</button>
+                    <button class="btn btn-success dropdown-item" type="button" value="Json" id="Json" >Json</button>
+                  </div>
+                </div>
+            </div>
+
+        </div>
+{#        </form>#}
+    </div>
+
+
+     <div  id="myModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" >
+        <div class="modal-content" style="width: 802px; background-color: #721c24;  color: white;" style="align:left">
+          <div class="modal-header">
+            <h5 class="modal-title">User Already in The List</h5>
+            <button id= "close_modal"type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+     </div>
+
+
+
+<script>
+     var modal = document.getElementById('myModal');
+     var close_modal = document.getElementById("close_modal")
+
+     close_modal.onclick = function() {
+          modal.style.display = "none";
+        }
+
+     window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+      function onload_table_user() {
+
+         {#reload full information#}
+         $data_user_table = []
+         $data_to_extract = getData();
+
+         if ($data_to_extract ==''){ $data_to_extract = []; }
+
+          debugger;
+         for(index=0; index<$data_to_extract.length; index++)
+            $data_to_insert.push({ user_id: $data_to_extract[index].user_id, role: $data_to_extract[index].role, country: $data_to_extract[index].country })
+
+         $('#tableUsers').bootstrapTable('load',$data_to_insert );
+        }
+
+     $( 'document' ).ready(function() {
+            // Handler for .ready() called.
+            debugger;
+            onload_table_user();
+        });
+
+
+        {#$('#tableUsers').onload(onload_table_user())#}
+
+    function getData(){
+        return load_data_backend()
+    }
+
+            {#load the previous saved user table info#}
+        function load_data_backend(){
+            debugger;
+            theUrl = '/user_table';
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false );
+            xmlHttp.send( null );
+            debugger;
+            value_return = JSON.parse(xmlHttp.responseText);
+
+            return value_return
+        }
+
+</script>
+
+<script>
+        var $table = $('#tableUsers');
+        var $user_name = $('#user_name');
+        var $user_id = $('#user_id');
+        var $country = $('#country');
+        var $role = $('#role');
+        $data_to_insert = [];
+        $data_to_extract = [];
+        var ad_group_query = '';
+
+        {#used to search if the ID is already in the table of users#}
+        function findElement($element, $key, $array_dictionary){
+          $index = -1;
+          $value_return = -1;
+          $.map($array_dictionary, function($row){
+              $index = $index + 1;
+              {#console.log($row[$key]);#}
+              if ($row[$key] == $element){
+                  $value_return = $index;
+                  modal.style.display = "block";
+              }
+              else{
+              }
+          })
+          return $value_return;
+        };
+
+        {#query the backend to indetify the AD group for the tool/country#}
+        {#there is a sync call to wait for the results, the fetch call didnt work#}
+        function query_ad(tool,country){
+
+          theUrl = '/tool_AD/' + tool + '/' + country;
+          var xmlHttp = new XMLHttpRequest();
+          xmlHttp.open( "GET", theUrl, false );
+          xmlHttp.send( null );
+          debugger;
+          ad_group_query = JSON.parse(xmlHttp.responseText).ad_group[0].ad_group;
+          {#debugger;#}
+          return ad_group_query;
+
+        };
+
+        {#query the backend to indetify the AD group for the tool/country#}
+        function query_ad2(tool,country) {
+            {#debugger;#}
+            data = fetch('/tool_AD/' + tool + '/' + country );
+            return fetch('/tool_AD/' + tool + '/' + country,  ).then(function(response) {
+                     return response.json().then(function(data) {
+                        {#debugger;#}
+                        for ( value of data.tool_ad) {
+                            {#ad_group_query = data.tool_ad.ad_group#}
+                            ad_group_query = value.ad_group;
+                            {#console.log('value of ad_group_query in the loop');#}
+                            return ad_group_query;
+                        }
+                        {#console.log('value of ad_group_query outside for');#}
+                        {#console.log(ad_group_query);#}
+                        {#return ad_group_query;#}
+                    });
+                    {#debugger;#}
+                    {#console.log('value of ad_group_query on fetch');#}
+                    {#console.log(ad_group_query);#}
+                    {#return ad_group_query;#}
+                })
+            {#debugger;#}
+            {#console.log('value of ad_group_query before return');#}
+            {#console.log(ad_group_query);#}
+            {#return ad_group_query;#}
+        };
+
+        {#for each of the tools selected (included the one added to the list)#}
+        {#extract the value in a json file#}
+        function extractTools(country) {
+          tool_list = []
+           $.map($('#table_tools').bootstrapTable('getData'),function(row){
+              {#debugger;#}
+              ad_group =  query_ad(row.tool_name,country);
+              tool_with_ad = {'id':row.tool_id, 'name':row.tool_name,'vendor':row.tool_vendor, 'country':country, 'ad_group':ad_group};
+              tool_list.push(tool_with_ad);
+              tool_list;
+              return tool_list;
+
+          })
+
+          return tool_list;
+
+        }
+
+        {#extract the IDs of the select users for downlaod an for deleting#}
+        function getIdSelections(){
+          {#console.log('getIdSelections');#}
+          {#console.log('talbe _ select 1:' + $('#tableUsers').bootstrapTable('getSelections'))#}
+          return $.map($('#tableUsers').bootstrapTable('getSelections'), function(row){
+              console.log('row.user_id: '+ row.user_id);
+              return row.user_id
+              }
+          )
+        }
+
+        {#extract the IDs of the select users for downlaod an for deleting#}
+        function getIdSelections2(){
+          {#console.log('getIdSelections');#}
+          {#console.log('talbe _ select 2:' + $('#tableUsers').bootstrapTable('getSelections'))#}
+          $obj_list = $('#tableUsers').bootstrapTable('getSelections');
+          {#console.log('obj_list: ' + $obj_list)#}
+          {#console.log('Jsonn parsed: ' + JSON.parse(obj_list))#}
+
+          $id_list = []
+          for (var $index=0; $index<$obj_list.length; $index++ ){
+            $id_list.push($obj_list[$index].user_id)
+          }
+          {#  console.log('$id_list: ');#}
+          {#console.log($id_list);#}
+          return $id_list;
+        }
+
+        {#save selected data to be extracted from the full list#}
+        function selected_data(){
+          var $ids = getIdSelections2();
+          console.log('get sel data: ');
+          console.log($ids);
+          $data_selected = []
+
+          for (var $index=0; $index<$ids.length; $index++ ){
+              for (var $index1=0; $index1<$data_to_extract.length; $index1++ ) {
+
+                  if($ids[$index] == $data_to_extract[$index1].user_id){
+                      $data_selected.push($data_to_extract[$index1])
+                  }
+              }
+          }
+          return $data_selected
+        }
+
+</script>
+
+<script>
+        {#add user to the table if not in the list and#}
+        {#create a json file with all the data for each of the users when the user is added to the table#}
+        $('#add_user').click(function () {
+            debugger;
+            $data = $('#tableUsers').bootstrapTable('getData').length;
+            $searchElement = findElement($user_id.val(),'user_id',$data_to_insert);
+            {#console.log($searchElement);#}
+            if (($user_name.val() !== "") && ($user_id.val() !== "") && ($country.val() !== "") && ($searchElement == (-1)) ){
+
+                $data_to_insert.push({'user_id': $user_id.val(), 'role': $role.val(), 'country': $country.val()});
+                $('#tableUsers').bootstrapTable('load', $data_to_insert);
+                tools = extractTools($country.val());
+                debugger;
+                $data_to_extract.push({ user_id: $user_id.val(), user_name: $user_name.val(), role: $role.val(), country: $country.val() , user_tools: tools });
+                post_data_to_backend($data_to_extract);
+            }
+            {#console.log(JSON.stringify($data_to_extract));#}
+            debugger;
+
+
+        });
+
+        {#remove selected users form the table#}
+        $('#delete_button').click(function(){
+          var ids = getIdSelections()
+          console.log(ids)
+          debugger;
+          $('#tableUsers').bootstrapTable('remove',{
+              field: 'user_id',
+              values: ids
+          })
+              for(index4=0; index4<ids.length; index4++){
+                  for(index3=0; index3<$data_to_extract.length; index3++){
+                     if ($data_to_extract[index3].user_id == ids[index4]){
+                         debugger;
+                         $data_to_extract.splice(index3,1);
+                     }
+              }
+          }
+
+        post_data_to_backend($data_to_extract);
+        });
+
+        {#change the initial message in the table when the table of user is empty#}
+        $('#tableUsers').bootstrapTable({
+          formatNoMatches: function () {
+              return 'No User Selected'
+          }
+        });
+
+        {#downlaod the data selected in Json format#}
+        $('#Json').click(function() {
+
+            $data_to_download = selected_data()
+            {#console.log('$data_to_download: ' + $data_to_download)#}
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify($data_to_download));
+            var a = document.createElement('a');
+            a.href = 'data:' + data;
+            a.download = 'data.json';
+
+            a.click();
+
+        });
+
+</script>
+  <script>
+      {#save on the backend the info on the user table to be retrieved later#}
+        function post_data_to_backend(data){
+            debugger;
+            $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        dataType: 'json',
+                        url: '/user_table',
+                        success: function (e) {
+                            console.log(e);
+                            window.location = "/user_table";
+                        },
+                        error: function(error) {
+                        console.log(error);
+                    }
+                    });
+        }
+
+  </script>

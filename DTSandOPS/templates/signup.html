@@ -1,0 +1,49 @@
+{% extends 'base_log.html' %}
+{% block title %}
+    Register User
+{% endblock %}
+
+{% block head %}
+{#    <link rel="icon" href="../static/image/favicon.ico" type="image/x-icon">#}
+
+{% endblock %}
+
+{% block body %}
+
+    <h1>Register</h1>
+    <form action="" method="post">
+        {{ form.csrf_token }}
+        {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.user_name.label }}<br>
+            {{ form.user_name(size=32) }}<br>
+            {% for error in form.user_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=64) }}<br>
+            {% for error in form.email.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password2.label }}<br>
+            {{ form.password2(size=32) }}<br>
+            {% for error in form.password2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+{% endblock %}

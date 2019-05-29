@@ -1,0 +1,117 @@
+
+    <div class="sidenav">
+        <!--<div class="col-md">-->
+        <form  method="POST">
+            {{ form.csrf_token }}
+
+            <div class="form-group">
+                <div class="form-">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                            {% if data in (jsondata['selected']) %}
+                                {{ form.discipline(id='discipline',class="form-control", onchange="requery_discipline()", selected="selected") }}
+                            {% else %}
+                                {{ form.discipline(id='discipline',class="form-control", onchange="requery_discipline()") }}
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                            {% if data in (jsondata['selected']) %}
+                                {{ form.core_role(id='core_role',class="form-control", onchange="requery_core_role()", selected="selected") }}
+                            {% else %}
+                                {{ form.core_role(id='core_role',class="form-control", onchange="requery_core_role()") }}
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                            {% if data in (jsondata['selected']) %}
+                                {{ form.role(id='role', class="form-control", onchange ="requery_role()", selected="selected") }}
+                            {% else %}
+                                {{ form.role(id='role', class="form-control", onchange ="requery_role()") }}
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+
+
+            <button id="submit_role" class="form-control btn btn-primary" type="submit" value="Search Tools by Role">
+                Search Tools by Role
+            </button>
+        </form>
+    </div>
+    <!--</div>-->
+    <!--</div>-->
+    <script>
+
+
+    function requery_discipline() {
+        var discipline_selected = document.getElementById("discipline");
+        var core_role_selected = document.getElementById("core_role");
+        var role_selected = document.getElementById("role");
+
+        discipline = discipline_selected.value;
+        fetch('/core_role/' + discipline).then(function(response) {
+
+                response.json().then(function(data) {
+                    var optionHTML = '';
+
+                    for (var core_role of data.core_role) {
+                        optionHTML += '<option value="' + core_role.id + '">' + core_role.name + '</option>';
+                    }
+
+                    core_role_selected.innerHTML = optionHTML;
+
+                    var optionHTML = '';
+                    for (var role of data.role) {
+                        optionHTML += '<option value="' + role.id + '">' + role.name + '</option>';
+                    }
+
+                    role_selected.innerHTML = optionHTML;
+                })
+
+            });
+
+        console.log("discipline");
+    }
+
+    function requery_core_role() {
+        var discipline_selected = document.getElementById("discipline");
+        var core_role_selected = document.getElementById("core_role");
+        var role_selected = document.getElementById("role");
+
+        discipline = discipline_selected.value;
+        core_role = core_role_selected.value;
+
+        fetch('/role/' + discipline + '/' + core_role ).then(function(response) {
+
+                response.json().then(function(data) {
+                    var optionHTML = '';
+
+                    for (var role of data.role) {
+
+                        optionHTML += '<option value="' + role.id + '">' + role.name + '</option>';
+                    }
+
+                    role_selected.innerHTML = optionHTML;
+
+
+                })
+
+            });
+
+        {#console.log("core_role");#}
+    }
+
+
+    </script>
+

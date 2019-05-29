@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+
+    {% include "staticfiles_js_css.html"  %}
+
+    {% block head %}
+
+
+    {% endblock %}
+</head>
+
+<body>
+    {% include "navbar_main_loggin.html" %}
+    {% block body %}
+
+
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,8 @@
+The main objective fo this project is to use the blueprint to split the application in sub apps
+
+26-09-2019
+
+1) split the file js and css in standard and tables
+1.1) the standard will be used by all the apps
+1.2) the others will be used for the tables etc
+

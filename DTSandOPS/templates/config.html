@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    main page
+{% endblock %}
+
+{% block head %}
+    <link rel="icon" href="../static/image/favicon.ico" type="image/x-icon">
+
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="row flex-xl-nowrap">
+        <div class="col-lg-2 sidebar_left">
+
+
+        </div>
+
+        <div class="col-lg-8 main" >
+            <div class="jumbotron">
+            {% include "tools/settings_1.html" %}
+            </div>
+        </div>
+        <div class="col-lg-2 sidebar_right" >
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

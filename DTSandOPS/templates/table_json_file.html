@@ -1,0 +1,18 @@
+    <table
+      id="table"
+      data-toggle="table"
+      data-height="460"
+      data-click-to-select="true"
+      data-side-pagination="client"
+      data-url="{{ url_for('static', filename='data/json/testdata.json') }}">
+
+      <thead>
+        <tr>
+          <th data-field="state" data-checkbox="true"></th>
+          <th data-field="id">ID</th>
+          <th data-field="name">Item Name</th>
+          <th data-field="price">Item Price</th>
+          <th data-field="price2">Item Price2</th>
+        </tr>
+      </thead>
+    </table>

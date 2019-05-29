@@ -1,0 +1,145 @@
+<script>
+
+    function change_db_type() {
+        var db_type_selected = document.getElementById("db_type");
+        var host_selected = document.getElementById("host");
+        var db_name_selected = document.getElementById("db_name");
+        var port_selected = document.getElementById("port");
+        var user_name_selected = document.getElementById("user_name");
+        var user_id_selected = document.getElementById("user_id");
+        var password_selected = document.getElementById("password");
+
+        var filename_selected = document.getElementById("filename");
+
+        db_type_ = db_type_selected.value;
+        host = host_selected;
+        port = port_selected;
+        db_name = db_name_selected;
+        user_name = user_name_selected;
+        user_id = user_id_selected;
+        password = password_selected;
+        filename = filename_selected;
+
+
+        if (db_type_ == 'mysql') {
+            host.setAttribute("type","text")
+            db_name.setAttribute("type","text")
+
+            port.setAttribute("type","text")
+            user_name.setAttribute("type","text")
+
+            password.setAttribute("type","password")
+            filename.setAttribute("type","hidden")
+        }
+        else if (db_type_ == 'sqlite') {
+            host.setAttribute("type","hidden")
+            db_name.setAttribute("type","hidden")
+            port.setAttribute("type","hidden")
+            user_name.setAttribute("type","hidden")
+
+            password.setAttribute("type","hidden")
+            filename.setAttribute("type","file")
+        }
+        else if (db_type_ == 'mongo') {
+            host.setAttribute("type","text")
+            db_name.setAttribute("type","text")
+            user_name.setAttribute("type","text")
+            port.setAttribute("type","text")
+            password.setAttribute("type","password")
+            filename.setAttribute("type","hidden")
+        }
+        else {
+
+        }
+
+    }
+
+    </script>
+           <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            <input type="checkbox" name="default_settings" value="default_settings" align="right"> default connection settings <br>
+                         </div>
+                    </div>
+                </div>
+           </div>
+
+
+<form  method="POST" enctype='multipart/form-data'>
+            {{ formDB.csrf_token }}
+
+
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                            {% if jsondata['selected'] %}
+                                {{ formDB.db_type(class="form-control", onchange ="change_db_type()", selected="selected") }}
+                            {% else %}
+                                {{ formDB.db_type(class="form-control", onchange ="change_db_type()") }}
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+
+           <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ formMysqlMongo.host(class="form-control", placeholder="host (e.g. localhost)") }}
+                         </div>
+                    </div>
+                </div>
+           </div>
+           <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ formMysqlMongo.port(class="form-control", placeholder="port (e.g. 3306 mysql, 27017 mongo)") }}
+                         </div>
+                    </div>
+                </div>
+           </div>
+
+
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ formMysqlMongo.db_name(class="form-control", placeholder="db_name") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ formMysqlMongo.user_name(class="form-control", placeholder="user_name") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon">
+                            {{ formMysqlMongo.password(class="form-control", autocomplete="current-password", placeholder="password") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-field">
+                        <div class="select-wrap">
+                            <div class="icon">
+                                {{ formSqlite.filename(class="form-control", placeholder="filname", type="hidden") }}
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <input class="form-control" type="submit" value="Submit">
+        </form>
+
