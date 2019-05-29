@@ -1,4 +1,4 @@
-{% extends 'base_log.html' %}
+{% extends 'base.html' %}
 {% block title %}
     Login
 {% endblock %}
@@ -10,8 +10,20 @@
 
 {% block body %}
 
-    <h1>Login</h1>
-    <form action="" method="post">
+
+
+    <div class="container-fluid">
+
+    <div class="row flex-xl-nowrap">
+        <div class="col-lg-2 sidebar_left">
+
+        </div>
+
+        <div class="col-lg-7 main" >
+
+            <h1>Login</h1>
+
+            <form action="" method="post">
         {{ form.csrf_token }}
         {{ form.hidden_tag() }}
 {#        <p>#}
@@ -38,5 +50,19 @@
         <p>{{ form.remember_me }} Remember Me</p>
         <p>{{ form.submit() }}</p>
     </form>
+
+        </div>
+        <div class="col-lg-3 sidebar_right" >
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
 
 {% endblock %}
