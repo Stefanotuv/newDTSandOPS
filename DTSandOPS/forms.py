@@ -7,12 +7,17 @@ from DTSandOPS.user import User
 
 class LoginForm(FlaskForm):
     # user_id = StringField('user_id',validators=[DataRequired()])
-    user_name = StringField('user_name',validators=[DataRequired(), Length(min=3, max=20)])
+    # user_name = StringField('user_name',validators=[DataRequired(), Length(min=3, max=20)])
+    # user_name = StringField('user_name')
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('remember_me', default=False)
     # in the other forms the SubmitField was not included/ used
     submit = SubmitField('LogIn')
+
+    def __init__(self, *args, **kwargs):
+        kwargs['csrf_enabled'] = False
+        super(LoginForm, self).__init__(*args, **kwargs)
 
 
 class RegistrationForm(FlaskForm):
@@ -34,6 +39,9 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+    def __init__(self, *args, **kwargs):
+        kwargs['csrf_enabled'] = False
+        super(RegistrationForm, self).__init__(*args, **kwargs)
 
 class RoleSelectionForm(FlaskForm):
     discipline = SelectField('discipline', choices=[])

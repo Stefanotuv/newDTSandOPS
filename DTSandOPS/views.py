@@ -261,29 +261,30 @@ def tables(table_name):
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        email = User.query.filter_by(email=form.email.data).first()
-        if email is None or not email.check_password(form.password.data):
+    login_form = LoginForm()
+    print(login_form.errors)
+    if login_form.validate_on_submit():
+        email = User.query.filter_by(email=login_form.email.data).first()
+        if email is None or not email.check_password(login_form.password.data):
             # flash('Invalid username or password')
             return redirect(url_for('login'))
-        login_user(email, remember=form.remember_me.data)
+        login_user(email, remember=login_form.remember_me.data)
         return redirect(url_for('login_confirm'))
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Sign In', login_form=login_form)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(user_name=form.user_name.data, email=form.email.data)
-        user.set_password(form.password.data)
+    registration_form = RegistrationForm()
+    if registration_form.validate_on_submit():
+        user = User(user_name=registration_form.user_name.data, registration_form=registration_form.email.data)
+        user.set_password(registration_form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(f'Congratulations { form.user_name.data }, you are now a registered user!','success')
+        flash(f'Congratulations { registration_form.user_name.data }, you are now a registered user!','success')
         return redirect(url_for('login'))
-    return render_template('signup.html', title='SignUp', form=form)
+    return render_template('signup.html', title='SignUp', registration_form=registration_form)
 
 @app.route('/login_confirm')
 def login_confirm():

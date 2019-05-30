@@ -24,39 +24,39 @@
         <div class="col-lg-7 main" >
 
             <h1>Register</h1>
-            <form action="" method="post">
-                {{ form.csrf_token }}
-                {{ form.hidden_tag() }}
+            <form action="" method="post"  name="signup">
+                {{ registration_form.csrf_token }}
+                {{ registration_form.hidden_tag() }}
 
                 <p>
-                    {{ form.user_name.label }}<br>
-                    {{ form.user_name(size=32) }}<br>
-                    {% for error in form.user_name.errors %}
+                    {{ registration_form.user_name.label }}<br>
+                    {{ registration_form.user_name(size=32) }}<br>
+                    {% for error in registration_form.user_name.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </p>
                 <p>
-                    {{ form.email.label }}<br>
-                    {{ form.email(size=64) }}<br>
-                    {% for error in form.email.errors %}
+                    {{ registration_form.email.label }}<br>
+                    {{ registration_form.email(size=64) }}<br>
+                    {% for error in registration_form.email.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </p>
                 <p>
-                    {{ form.password.label }}<br>
-                    {{ form.password(size=32) }}<br>
-                    {% for error in form.password.errors %}
+                    {{ registration_form.password.label }}<br>
+                    {{ registration_form.password(size=32) }}<br>
+                    {% for error in registration_form.password.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </p>
                 <p>
-                    {{ form.password2.label }}<br>
-                    {{ form.password2(size=32) }}<br>
-                    {% for error in form.password2.errors %}
+                    {{ registration_form.password2.label }}<br>
+                    {{ registration_form.password2(size=32) }}<br>
+                    {% for error in registration_form.password2.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </p>
-                <p>{{ form.submit() }}</p>
+                <p>{{ registration_form.submit() }}</p>
             </form>
         </div>
         <div class="col-lg-3 sidebar_right" >
