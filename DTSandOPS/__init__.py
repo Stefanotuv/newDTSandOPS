@@ -16,7 +16,6 @@ app.config['SECRET_KEY'] = 'stefanotuv'
 
 # require the installation of pyMongo
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://stefano:stefano@localhost/DTSOPS'
-
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(STATIC_DIR, 'db_local/role_tool_DB2.db')
 
 
@@ -24,8 +23,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://stefano:stefano@localho
 app.config['user_table'] = ''
 
 db = SQLAlchemy(app)
-login = LoginManager(app)
 bcrypt = Bcrypt(app)
+login = LoginManager(app)
+login.login_view = 'login'
+login.login_message_category = 'info'
 
 from DTSandOPS import views
 

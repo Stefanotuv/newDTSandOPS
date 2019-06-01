@@ -11,13 +11,10 @@ from DTSandOPS.forms import RoleSelectionForm, UserForm, RegistrationForm, Login
 from DTSandOPS.forms import SettingsDatabaseForm, SettingsMysqlMongoForm, SettingsSqliteForm
 from DTSandOPS import app
 from DTSandOPS import db
-from DTSandOPS import login
-from DTSandOPS import bcrypt
 
 from werkzeug import secure_filename
 from DTSandOPS.utils.global_variable import *
-# from flask_login import LoginManager
-from flask_login import current_user, login_user
+from flask_login import login_user, current_user, logout_user,current_user, login_required
 from flask import flash
 
 def allowed_file(filename):
@@ -258,6 +255,7 @@ def tables(table_name):
 
 
 @app.route('/login', methods=['GET', 'POST'])
+# @login.user_loader
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -265,7 +263,7 @@ def login():
     print(login_form.errors)
     if login_form.validate_on_submit():
         email = User.query.filter_by(email=login_form.email.data).first()
-        if email is None or not email.check_password(login_form.password.data):
+        if email.email is None or not email.check_password(login_form.password.data):
             # flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(email, remember=login_form.remember_me.data)
@@ -278,7 +276,7 @@ def register():
         return redirect(url_for('index'))
     registration_form = RegistrationForm()
     if registration_form.validate_on_submit():
-        user = User(user_name=registration_form.user_name.data, registration_form=registration_form.email.data)
+        user = User(user_name=registration_form.user_name.data, email=registration_form.email.data)
         user.set_password(registration_form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -290,13 +288,12 @@ def register():
 def login_confirm():
     return render_template('login_confirm.html', title='login_confirm')
 
-    if __name__ == '__main__':
-        app.run(port=4998, debug=True)
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
-    print(json_full_values)
 
-    return json_full_values
-    pass
 
 def Json_users_data_reduced(Json_data_list):
     Json_reduced = []
