@@ -2,8 +2,8 @@ __author__ = "stefanotuv"
 
 from flask_wtf import FlaskForm
 from wtforms import SelectField,  StringField, PasswordField, SubmitField, BooleanField,FileField, validators
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
-from DTSandOPS.user import User
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from DTSandOPS.users.user import User
 
 class LoginForm(FlaskForm):
     # user_id = StringField('user_id',validators=[DataRequired()])

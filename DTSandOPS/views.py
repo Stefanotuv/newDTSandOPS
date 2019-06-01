@@ -1,7 +1,7 @@
 __author__ = "stefanotuv"
 
 from flask import request, render_template, jsonify, url_for, redirect
-from DTSandOPS.user import User
+from DTSandOPS.users.user import User
 from DTSandOPS.role import Role
 from DTSandOPS.role_tool import Role_Tool
 from DTSandOPS.tool_ad import Tool_AD
@@ -14,7 +14,7 @@ from DTSandOPS import db
 
 from werkzeug import secure_filename
 from DTSandOPS.utils.global_variable import *
-from flask_login import login_user, current_user, logout_user,current_user, login_required
+from flask_login import login_user, logout_user,current_user
 from flask import flash
 
 def allowed_file(filename):
