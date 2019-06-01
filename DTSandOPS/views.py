@@ -43,10 +43,10 @@ def connect():
         if db_type == 'sqlite':
             file = request.files['filename']
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['LOCAL_DB_FOLDER'], filename))
+            file.save(os.path.join(app__.config['LOCAL_DB_FOLDER'], filename))
             allowed = allowed_file(filename)
             if ((filename != "") and (allowed == True)):
-                app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
+                app__.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app__.config['LOCAL_DB_FOLDER'], filename)
 
             else:
                 pass
@@ -55,7 +55,7 @@ def connect():
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
             # location fo the db, dbname, user and password to be passed as parameter
-                app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'.\
+                app__.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'.\
                     format(settingsMysqlMongoForm.user_name.data,settingsMysqlMongoForm.password.data,\
                            settingsMysqlMongoForm.host.data,settingsMysqlMongoForm.port.data,settingsMysqlMongoForm.db_name.data)
             else:
@@ -101,7 +101,7 @@ def main_page():
 
         keys = [key for key in request.form.keys()]
         value_selected = [request.form[key] for key in keys]
-        Json_users_data = app.config['user_table']
+        Json_users_data = app__.config['user_table']
 
 
         # the file for the table requires only the ID country and role a function to be created
@@ -197,7 +197,7 @@ def role_load(discipline_selected,core_role_selected):
 
     return jsonify({'role': role_array})
 
-@app.route('/tool_AD/<tool>/<country>')
+@app__.route('/tool_AD/<tool>/<country>')
 # used to extract the AD for the tool based on the country
 def tool_AD_for_country(tool,country):
 
@@ -214,10 +214,10 @@ def tool_AD_for_country(tool,country):
 @app.route('/user_table', methods = ['GET', 'POST'])
 def store_user_table():
     if request.method == 'POST':
-        app.config['user_table'] = request.json
+        app__.config['user_table'] = request.json
         # print(request.json)
     elif request.method == 'GET':
-        data = jsonify(app.config['user_table'])
+        data = jsonify(app__.config['user_table'])
         # print(data)
         return data
     else:
