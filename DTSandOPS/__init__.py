@@ -1,33 +1,31 @@
 __author__ = "stefanotuv"
 
-from flask import Flask
+from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from DTSandOPS.config import Config
 
-app = Flask(__name__)
-
-# the secret key in python can be generate from the module secrets
-#
-# python
-# >> import secrets
-# >> secret.token_hex(16)
-app.config['SECRET_KEY'] = 'stefanotuv'
-
-# require the installation of pyMongo
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://stefano:stefano@localhost/DTSOPS'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(STATIC_DIR, 'db_local/role_tool_DB2.db')
-
-
-# to allow to post/ save the user tables when querying for new role/tools
-app.config['user_table'] = ''
-
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login = LoginManager(app)
+db = SQLAlchemy()
+bcrypt = Bcrypt()
+login = LoginManager()
 login.login_view = 'login'
 login.login_message_category = 'info'
 
-from DTSandOPS import views
+# from DTSandOPS import views
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    db.init_app(app)
+    bcrypt.init_app(app)
+    login.init_app(app)
+    # from DTSandOPS import views
+    from DTSandOPS.users.views import users
+
+    app.register_blueprint(users)
+
+    return app
 
 

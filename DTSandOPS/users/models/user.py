@@ -18,7 +18,11 @@ class User(UserMixin, db.Model):
     user_name = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    columns = ['user_id','user_name','email','password_hash']
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    name = db.Column(db.String(64))
+    surname = db.Column(db.String(64))
+    DOB = db.Column(db.DateTime)
+    columns = ['user_id','user_name','email','password_hash','image_file', 'name', 'surname','DOB']
 
     def columns(self):
         return self.columns
@@ -34,6 +38,4 @@ class User(UserMixin, db.Model):
         self.password_hash = bcrypt.generate_password_hash(password).decode('UTF-8')
 
     def check_password(self, password):
-        # return check_password_hash(self.password_hash, password)
         return bcrypt.check_password_hash(self.password_hash, password)
-        # return check_password_hash(self.password_hash, bcrypt.generate_password_hash(password).decode('UTF-8'))

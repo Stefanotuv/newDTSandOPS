@@ -1,3 +1,10 @@
 bcrypt to generate hash password
 
 flask_bcrypt
+
+# the secret key in python can be generate from the module secrets
+#
+# python
+# >> import secrets
+# >> secret.token_hex(16)
+# app.config['SECRET_KEY'] = 'stefanotuv'
