@@ -263,7 +263,7 @@ def login():
     print(login_form.errors)
     if login_form.validate_on_submit():
         email = User.query.filter_by(email=login_form.email.data).first()
-        if email.email is None or not email.check_password(login_form.password.data):
+        if email is None or not email.check_password(login_form.password.data):
             # flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(email, remember=login_form.remember_me.data)
@@ -273,7 +273,7 @@ def login():
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('login_confirm'))
     registration_form = RegistrationForm()
     if registration_form.validate_on_submit():
         user = User(user_name=registration_form.user_name.data, email=registration_form.email.data)
