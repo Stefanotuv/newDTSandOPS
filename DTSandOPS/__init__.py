@@ -17,14 +17,20 @@ login.login_message_category = 'info'
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config['user_table'] = ''
+    app.config['dbtype'] = 'mysql'
 
     db.init_app(app)
     bcrypt.init_app(app)
     login.init_app(app)
     # from DTSandOPS import views
     from DTSandOPS.users.views import users
+    from DTSandOPS.main.views import main
+    from DTSandOPS.db_mng.views import db_mng
 
     app.register_blueprint(users)
+    app.register_blueprint(main)
+    app.register_blueprint(db_mng)
 
     return app
 

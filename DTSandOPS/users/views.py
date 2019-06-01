@@ -6,7 +6,7 @@ from DTSandOPS.users.forms import RegistrationForm, LoginForm
 from DTSandOPS import db
 
 from werkzeug import secure_filename
-from DTSandOPS.utils.global_variable import *
+from DTSandOPS.utilities.global_variable import *
 
 
 from flask_login import login_user, logout_user,current_user

@@ -1,88 +1,24 @@
 __author__ = "stefanotuv"
 
-from flask import request, render_template, jsonify, url_for, redirect
-from DTSandOPS.users.models.user import User
-from DTSandOPS.role import Role
-from DTSandOPS.role_tool import Role_Tool
-from DTSandOPS.tool_ad import Tool_AD
-from DTSandOPS.tool import Tool
-from DTSandOPS.country import Country
-from DTSandOPS.forms import RoleSelectionForm, UserForm
-from DTSandOPS.forms import SettingsDatabaseForm, SettingsMysqlMongoForm, SettingsSqliteForm
-from DTSandOPS import app
-from DTSandOPS import db
+from flask import request, render_template, jsonify, Blueprint
+from DTSandOPS.main.models.role import Role
+from DTSandOPS.main.models.role_tool import Role_Tool
+from DTSandOPS.main.models.tool_ad import Tool_AD
+from DTSandOPS.main.models.tool import Tool
+from DTSandOPS.main.models.country import Country
+from DTSandOPS.main.forms import RoleSelectionForm, UserForm
+from flask import current_app as app
 
-from werkzeug import secure_filename
-from DTSandOPS.utils.global_variable import *
-from flask_login import login_user, logout_user,current_user
-from flask import flash
+from DTSandOPS.utilities.global_variable import *
+
+main = Blueprint('main', __name__, template_folder='templates')
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/connect', methods = ['GET', 'POST'])
-    # this should be used to configure the DB to be used
-def connect():
-    settingsDBForm = SettingsDatabaseForm()
-    settingsDBForm.db_type.choices = [('mysql', 'mysql'), ('sqlite', 'sqlite'),  ('mongo', 'mongo')]
-
-    settingsMysqlMongoForm = SettingsMysqlMongoForm()
-    settingsSqliteForm = SettingsSqliteForm()
-    jsondata={}
-
-    if request.method == 'POST':
-    # getting the information from the post to get what DB and the other
-    # connectivity details
-
-        keys = [key for key in request.form.keys()]
-        value_selected = [request.form[key] for key in keys]
-
-        db_type = value_selected[1]
-        jsondata ={'selected':db_type}
-        if db_type == 'sqlite':
-            file = request.files['filename']
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app__.config['LOCAL_DB_FOLDER'], filename))
-            allowed = allowed_file(filename)
-            if ((filename != "") and (allowed == True)):
-                app__.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app__.config['LOCAL_DB_FOLDER'], filename)
-
-            else:
-                pass
-
-        elif db_type == 'mysql':
-            if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
-                    and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
-            # location fo the db, dbname, user and password to be passed as parameter
-                app__.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'.\
-                    format(settingsMysqlMongoForm.user_name.data,settingsMysqlMongoForm.password.data,\
-                           settingsMysqlMongoForm.host.data,settingsMysqlMongoForm.port.data,settingsMysqlMongoForm.db_name.data)
-            else:
-                pass
-        elif db_type == 'mongo':
-            if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
-                    and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
-            # location fo the db, dbname, user and password to be passed as parameter
-
-                app.config['MONGOALCHEMY_DATABASE'] = settingsMysqlMongoForm.db_name.data
-                app.config['MONGOALCHEMY_SERVER'] = settingsMysqlMongoForm.host.data
-                app.config['MONGOALCHEMY_PORT'] = settingsMysqlMongoForm.port.data
-                app.config['MONGOALCHEMY_USER'] = settingsMysqlMongoForm.user_name.data
-                app.config['MONGOALCHEMY_PASSWORD'] = settingsMysqlMongoForm.password.data
-            else:
-                pass
-
-        else:
-            # error?
-            pass
-    else:
-        pass
-
-    return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, \
-                           jsondata=jsondata)
-
-@app.route('/main_page', methods = ['GET', 'POST'])
+@main.route('/main_page', methods = ['GET', 'POST'])
 def main_page():
     role_selection_form = RoleSelectionForm()
     user_form = UserForm()
@@ -101,7 +37,7 @@ def main_page():
 
         keys = [key for key in request.form.keys()]
         value_selected = [request.form[key] for key in keys]
-        Json_users_data = app__.config['user_table']
+        Json_users_data = app.config['user_table']
 
 
         # the file for the table requires only the ID country and role a function to be created
@@ -166,7 +102,7 @@ def main_page():
 
     return render_template('main_page_new_11.html', form = role_selection_form, user_form=user_form, jsondata=jsondata, json_user_table= json_user_table)
 
-@app.route('/core_role/<discipline_selected>')
+@main.route('/core_role/<discipline_selected>')
 # used to load the core_role and role based on the discipline selected
 def core_role_load(discipline_selected):
 
@@ -186,7 +122,7 @@ def core_role_load(discipline_selected):
 
     return jsonify({'core_role' : core_role_array, 'role': role_array})
 
-@app.route('/role/<discipline_selected>/<core_role_selected>')
+@main.route('/role/<discipline_selected>/<core_role_selected>')
 # used to load the role based on the core_role selected
 def role_load(discipline_selected,core_role_selected):
 
@@ -197,7 +133,7 @@ def role_load(discipline_selected,core_role_selected):
 
     return jsonify({'role': role_array})
 
-@app__.route('/tool_AD/<tool>/<country>')
+@main.route('/tool_AD/<tool>/<country>')
 # used to extract the AD for the tool based on the country
 def tool_AD_for_country(tool,country):
 
@@ -211,20 +147,20 @@ def tool_AD_for_country(tool,country):
     return jsonify({'ad_group': tool_ad_array})
 
 # record the table of users
-@app.route('/user_table', methods = ['GET', 'POST'])
+@main.route('/user_table', methods = ['GET', 'POST'])
 def store_user_table():
     if request.method == 'POST':
-        app__.config['user_table'] = request.json
+        app.config['user_table'] = request.json
         # print(request.json)
     elif request.method == 'GET':
-        data = jsonify(app__.config['user_table'])
+        data = jsonify(app.config['user_table'])
         # print(data)
         return data
     else:
         pass
     return ''
 
-@app.route('/tables/<table_name>', methods = ['GET'])
+@main.route('/tables/<table_name>', methods = ['GET'])
 def tables(table_name):
     full_values = []
     full_values
