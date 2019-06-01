@@ -258,7 +258,7 @@ def tables(table_name):
 # @login.user_loader
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main_page'))
     login_form = LoginForm()
     print(login_form.errors)
     if login_form.validate_on_submit():
@@ -291,8 +291,8 @@ def login_confirm():
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for('home'))
-
+    return render_template('logout.html')
+    # return redirect(url_for('home'))
 
 
 def Json_users_data_reduced(Json_data_list):

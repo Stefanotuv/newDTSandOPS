@@ -1,11 +1,15 @@
 __author__ = "stefanotuv"
 
-from DTSandOPS import db
+from DTSandOPS import db, login
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from DTSandOPS import bcrypt
 
 from flask_login import UserMixin
+
+@login.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class User(UserMixin, db.Model):
@@ -19,6 +23,8 @@ class User(UserMixin, db.Model):
     def columns(self):
         return self.columns
 
+    def get_id(self):
+        return str(self.id)
 
     def __repr__(self):
         return '<User {}>'.format(self.user_name)
