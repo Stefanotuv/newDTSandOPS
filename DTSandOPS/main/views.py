@@ -11,7 +11,7 @@ from flask import current_app as app
 
 from DTSandOPS.utilities.global_variable import *
 
-main = Blueprint('main', __name__, template_folder='templates')
+main = Blueprint('main', __name__, template_folder='templates', url_prefix='/main')
 
 
 def allowed_file(filename):

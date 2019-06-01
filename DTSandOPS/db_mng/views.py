@@ -9,7 +9,7 @@ from werkzeug import secure_filename
 from DTSandOPS.utilities.global_variable import *
 
 
-db_mng = Blueprint('db_mng', __name__, template_folder='templates')
+db_mng = Blueprint('db_mng', __name__, template_folder='templates', url_prefix='/db')
 
 def allowed_file(filename):
     return '.' in filename and \

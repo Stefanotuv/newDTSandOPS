@@ -12,7 +12,7 @@ from DTSandOPS.utilities.global_variable import *
 from flask_login import login_user, logout_user,current_user
 from flask import flash
 
-users = Blueprint('users', __name__, template_folder='templates')
+users = Blueprint('users', __name__, template_folder='templates', url_prefix='/auth')
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
