@@ -1,6 +1,5 @@
 __author__ = "stefanotuv"
 
-__author__ = "stefanotuv"
 
 import sys
 import os.path

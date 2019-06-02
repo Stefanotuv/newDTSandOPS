@@ -1,5 +1,5 @@
 <script>
-
+    function selected_db(){}
     function change_db_type() {
         var db_type_selected = document.getElementById("db_type");
         var host_selected = document.getElementById("host");
@@ -8,6 +8,8 @@
         var user_name_selected = document.getElementById("user_name");
         var user_id_selected = document.getElementById("user_id");
         var password_selected = document.getElementById("password");
+
+        var existing_db_selected = document.getElementById("existing_db");
 
         var filename_selected = document.getElementById("filename");
 
@@ -19,6 +21,7 @@
         user_id = user_id_selected;
         password = password_selected;
         filename = filename_selected;
+        existing_db = existing_db_selected
 
 
         if (db_type_ == 'mysql') {
@@ -36,8 +39,10 @@
             db_name.setAttribute("type","hidden")
             port.setAttribute("type","hidden")
             user_name.setAttribute("type","hidden")
-
+            existing_db.setAttribute('type','text')
             password.setAttribute("type","hidden")
+
+
             filename.setAttribute("type","file")
         }
         else if (db_type_ == 'mongo') {
@@ -54,16 +59,16 @@
 
     }
 
-    </script>
-           <div class="form-group">
-                <div class="form-field">
-                    <div class="select-wrap">
-                        <div class="icon">
-                            <input type="checkbox" name="default_settings" value="default_settings" align="right"> default connection settings <br>
-                         </div>
-                    </div>
-                </div>
-           </div>
+</script>
+<div class="form-group">
+    <div class="form-field">
+        <div class="select-wrap">
+            <div class="icon">
+                <input type="checkbox" name="default_settings" value="default_settings" align="right"> default connection settings <br>
+             </div>
+        </div>
+    </div>
+</div>
 
 
 <form  method="POST" enctype='multipart/form-data'>
@@ -82,6 +87,19 @@
                     </div>
                 </div>
             </div>
+
+{#            <div class="form-group">#}
+{#                <div class="form-field">#}
+{#                    <div class="select-wrap">#}
+{#                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>#}
+{#                            {% if jsondata['selected'] %}#}
+{#                                {{ formMysqlMongo.existing_db(class="form-control", onchange ="selected_db()", selected="selected") }}#}
+{#                            {% else %}#}
+{#                                {{ formMysqlMongo.existing_db(class="form-control" ) }}#}
+{#                            {% endif %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
 
            <div class="form-group">
                 <div class="form-field">
@@ -131,6 +149,20 @@
                     </div>
                 </div>
             </div>
+
+            <div class="form-group">
+                <div class="form-field">
+                        <div class="select-wrap">
+                            <div class="icon">
+                                {{ formSqlite.existing_db(class="form-control", placeholder="existing_db", type="hidden") }}
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+
+
+
             <div class="form-group">
                 <div class="form-field">
                         <div class="select-wrap">

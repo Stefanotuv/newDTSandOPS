@@ -50,7 +50,6 @@ def connect():
                 app.config['connected'] = False
 
                 pass
-
         elif db_type == 'mysql':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
