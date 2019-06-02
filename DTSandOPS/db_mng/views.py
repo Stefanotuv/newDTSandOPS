@@ -7,6 +7,7 @@ from flask import current_app as app
 
 from werkzeug import secure_filename
 from DTSandOPS.utilities.global_variable import *
+from DTSandOPS.db_mng.utilities.local_variables import *
 
 
 db_mng = Blueprint('db_mng', __name__, template_folder='templates', url_prefix='/db')
@@ -37,12 +38,17 @@ def connect():
         if db_type == 'sqlite':
             file = request.files['filename']
             filename = secure_filename(file.filename)
+            app.config['LOCAL_DB_FOLDER'] = LOCAL_DB_FOLDER
             file.save(os.path.join(app.config['LOCAL_DB_FOLDER'], filename))
             allowed = allowed_file(filename)
             if ((filename != "") and (allowed == True)):
                 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
-
+                app.config['dbtype'] = 'sqlite'
+                app.config['connected'] = True
             else:
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
+
                 pass
 
         elif db_type == 'mysql':
@@ -75,6 +81,17 @@ def connect():
 
     return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, \
                            jsondata=jsondata)
+
+@db_mng.route('/check_connection')
+# check if the connection is active
+def check_connection():
+    pass
+
+@db_mng.route('/check_table')
+# check if the table exist in the db
+def check_table():
+    pass
+
 
 def Json_users_data_reduced(Json_data_list):
     Json_reduced = []
