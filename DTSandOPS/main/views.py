@@ -1,6 +1,6 @@
 __author__ = "stefanotuv"
 
-from flask import request, render_template, jsonify, Blueprint
+from flask import request, render_template, jsonify, Blueprint, url_for
 from DTSandOPS.main.models.role import Role
 from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.tool_ad import Tool_AD
@@ -59,14 +59,20 @@ def main_page():
         role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
             Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
 
+        # role_selection_form.discipline.choices = url_for('/query/roles/disciplines')
+
         role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
             Role.query.filter_by(discipline=value_selected[1]). \
                     with_entities(Role.core_role).distinct(Role.core_role)]
+
+        # role_selection_form.core_role.choices = url_for('/query/core_roles/<{}'.format(value_selected[1]))
 
         role_selection_form.role.choices = [(q.role, q.role) for q in \
             Role.query.filter_by(discipline=value_selected[1], \
                 core_role=value_selected[2]). \
                     with_entities(Role.role).distinct(Role.role)]
+
+        # role_selection_form.role.choices = url_for('/query/roles/{}/{}'.format(value_selected[1],value_selected[2]))
 
         user_form.country.choices = [(q.country_code, q.country_code) for q in \
             Country.query.with_entities(Country.country_code)]

@@ -46,9 +46,8 @@ def connect():
                 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
                 app.config['dbtype'] = 'sqlite'
                 app.config['connected'] = True
-
-                # db_tables
-
+                # return the tables in the connected db
+                tables = check_tables()
 
                 return render_template('connected.html')
             else:
@@ -67,7 +66,10 @@ def connect():
                            settingsMysqlMongoForm.host.data,settingsMysqlMongoForm.port.data,settingsMysqlMongoForm.db_name.data)
                 app.config['dbtype'] = 'mysql'
                 app.config['connected'] = True
-                return render_template('connected.html')
+
+                tables = check_tables()
+
+                # return render_template('connected.html')
             else:
                 app.config['dbtype'] = ''
                 app.config['connected'] = False
@@ -105,9 +107,10 @@ def connect():
 def check_connection():
     pass
 
-@db_mng.route('/check_table')
+@db_mng.route('/check_tables')
 # check if the table exist in the db
-def check_table():
+def check_tables():
+    return [cls for cls in db.Model._decl_class_registry.values() if isinstance(cls, type) and issubclass(cls, db.Model)]
     pass
 
 

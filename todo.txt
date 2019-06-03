@@ -1,16 +1,26 @@
 The main objective fo this project is to use the blueprint to split the application in sub apps
 
-26-09-2019
+26-05-2019
 
 1) split the file js and css in standard and tables
 1.1) the standard will be used by all the apps
 1.2) the others will be used for the tables etc
 
-02-07-2019
+02-06-2019
 
-1) to understand how to manage the connections to the DB.
+to understand how to manage the connections to the DB.
 - it should be initially closed
 - set the connection to decide the db
 - test the connection and if the db exist
 - offer to build the tables
 - offer to import dummy data from json
+
+04-06-2019
+- review the main app and simplify by colling the api (to understand if the simple call qould work)
+- create the option to check the connection before going to the main page
+- review when to connect and make the authorisations
+- review how modify the connection page to:
+    - load the various db
+    - test if the table exists
+    - create the table if the dont exist
+    - split in test-connection, check db, upload, new etc
