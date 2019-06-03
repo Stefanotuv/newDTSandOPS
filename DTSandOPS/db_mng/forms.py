@@ -27,11 +27,14 @@ class SettingsMysqlMongoForm(FlaskForm):
     def __init__(self):
         # use a local json file where to save the connection details once they are successful
         super().__init__()
-        self.existing_db.choices = [('New', 'New')]
+        self.existing_db.choices = [('Create New', 'Create New'),('Upload','Upload')]
         pass
 
     def save_config(self):
         # get the data from the form and save in the json file: db_config.json
+        pass
+
+    def laod_db_settings(self):
         pass
 
 
@@ -41,23 +44,19 @@ class SettingsSqliteForm(FlaskForm):
     existing_db = SelectField('existing_db', choices=[])
 
     # initialise the list  with the existing db in the folder
-
     def __init__(self):
         # get all the file .sql or .db from the folder
         super().__init__()
-        self.existing_db.choices = [('New', 'New')]
-        [self.existing_db.choices.append((item,item)) for item in self.laod()]
+        self.existing_db.choices = [('New Connection', 'New Connection')]
+        # load db file for option selection
+        [self.existing_db.choices.append((item,item)) for item in self.laod_db_files()]
         pass
 
-    def laod(self):
+    def laod_db_files(self):
         # load files form the default folder
-        # onlyfiles = [f for f in listdir(LOCAL_DB_FOLDER) if isfile(join(LOCAL_DB_FOLDER, f))]
         db_sqlite_files = []
         for file in os.listdir(LOCAL_DB_FOLDER):
             if os.path.splitext(file)[1] in ALLOWED_DB_EXTENSIONS:
                 db_sqlite_files.append(file)
                 print(file)
-            # if fnmatch.fnmatch(file, '*.db') or fnmatch.fnmatch(file, '*.sql') or :
-            #     db_sqlite_files.append(file)
-            #     print(file)
         return db_sqlite_files

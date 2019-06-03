@@ -8,6 +8,7 @@ from flask import current_app as app
 from werkzeug import secure_filename
 from DTSandOPS.utilities.global_variable import *
 from DTSandOPS.db_mng.utilities.local_variables import *
+from DTSandOPS import db
 
 
 db_mng = Blueprint('db_mng', __name__, template_folder='templates', url_prefix='/db')
@@ -45,6 +46,10 @@ def connect():
                 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
                 app.config['dbtype'] = 'sqlite'
                 app.config['connected'] = True
+
+                # db_tables
+
+
                 return render_template('connected.html')
             else:
                 app.config['dbtype'] = ''
@@ -96,6 +101,7 @@ def connect():
 
 @db_mng.route('/check_connection')
 # check if the connection is active
+# connections apply only for
 def check_connection():
     pass
 
