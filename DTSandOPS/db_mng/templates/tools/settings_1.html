@@ -1,63 +1,79 @@
 <script>
+
+
     function selected_db(){}
+
     function change_db_type() {
         var db_type_selected = document.getElementById("db_type");
         var host_selected = document.getElementById("host");
         var db_name_selected = document.getElementById("db_name");
         var port_selected = document.getElementById("port");
         var user_name_selected = document.getElementById("user_name");
-        var user_id_selected = document.getElementById("user_id");
         var password_selected = document.getElementById("password");
-
-        var existing_db_selected = document.getElementById("existing_db");
-
+        var existing_db_sqlite_selected = document.getElementById("existing_db_sqlite");
+        var existing_db_mySql_Mongo_selected = document.getElementById("existing_db_mysql_mongo");
         var filename_selected = document.getElementById("filename");
-
-        db_type_ = db_type_selected.value;
-        host = host_selected;
-        port = port_selected;
-        db_name = db_name_selected;
-        user_name = user_name_selected;
-        user_id = user_id_selected;
-        password = password_selected;
-        filename = filename_selected;
-        existing_db = existing_db_selected
-
-
-        if (db_type_ == 'mysql') {
-            host.setAttribute("type","text")
-            db_name.setAttribute("type","text")
-
-            port.setAttribute("type","text")
-            user_name.setAttribute("type","text")
-
-            password.setAttribute("type","password")
-            filename.setAttribute("type","hidden")
-        }
-        else if (db_type_ == 'sqlite') {
-            host.setAttribute("type","hidden")
-            db_name.setAttribute("type","hidden")
-            port.setAttribute("type","hidden")
-            user_name.setAttribute("type","hidden")
-            existing_db.setAttribute('type','text')
-            password.setAttribute("type","hidden")
-
-
-            filename.setAttribute("type","file")
-        }
-        else if (db_type_ == 'mongo') {
-            host.setAttribute("type","text")
-            db_name.setAttribute("type","text")
-            user_name.setAttribute("type","text")
-            port.setAttribute("type","text")
-            password.setAttribute("type","password")
-            filename.setAttribute("type","hidden")
-        }
+        var db_type_ = db_type_selected.value;
+        var host = host_selected;
+        var port = port_selected;
+        var db_name = db_name_selected;
+        var user_name = user_name_selected;
+        var password = password_selected;
+        var filename = filename_selected;
+        var existing_db_sqlite = existing_db_sqlite_selected;
+        var existing_db_mysql_mongo = existing_db_mySql_Mongo_selected;
+        debugger;
+        if (db_type_ == 'mysql') { load_mysql_form(); }
+        else if (db_type_ == 'sqlite') { load_sqlite_form(); }
+        else if (db_type_ == 'mongo') { load_mongo_form(); }
         else {
 
         }
 
     }
+
+    function load_mysql_form(){
+            host.setAttribute("type","text");
+            db_name.setAttribute("type","text");
+            port.setAttribute("type","text");
+            user_name.setAttribute("type","text");
+            password.setAttribute("type","password");
+            {#existing_db_mysql_mongo.setAttribute("type","text");#}
+            {#existing_db_sqlite.setAttribute("type","hidden");#}
+            {#existing_db_sqlite.style.visibility = 'hidden'#}
+            existing_db_sqlite.style.display = 'None';
+            existing_db_mysql_mongo.style.display = 'inline';
+            filename.setAttribute("type","hidden");
+    }
+    function load_sqlite_form(){
+            debugger;
+            host.setAttribute("type","hidden");
+            db_name.setAttribute("type","hidden");
+            port.setAttribute("type","hidden");
+            user_name.setAttribute("type","hidden");
+            {#existing_db_mysql_mongo.setAttribute("type","hidden");#}
+            {#existing_db_mysql_mongo.style.visibility = 'hidden'#}
+            {#existing_db_sqlite.setAttribute("type","text");#}
+            existing_db_sqlite.style.display = 'inline';
+            existing_db_mysql_mongo.style.display = 'None';
+            password.setAttribute("type","hidden");
+            filename.setAttribute("type","file");
+
+    }
+    function load_mongo_form(){
+            host.setAttribute("type","text");
+            db_name.setAttribute("type","text");
+            user_name.setAttribute("type","text");
+            port.setAttribute("type","text");
+            password.setAttribute("type","password");
+            {#existing_db_mysql_mongo.setAttribute("type","text");#}
+            {#existing_db_sqlite.setAttribute("type","hidden");#}
+            {#existing_db_sqlite.style.visibility = 'hidden';#}
+            existing_db_sqlite.style.display = 'None';
+            existing_db_mysql_mongo.style.display = 'inline';
+            filename.setAttribute("type","hidden");
+    }
+
 
 </script>
 <div class="form-group">
@@ -80,32 +96,29 @@
                     <div class="select-wrap">
                         <div class="icon"><span class="ion-ios-arrow-down"></span></div>
                             {% if jsondata['selected'] %}
-                                {{ formDB.db_type(class="form-control", onchange ="change_db_type()", selected="selected") }}
+                                {{ formDB.db_type(id= 'db_type',class="form-control", onchange ="change_db_type()", selected="selected") }}
                             {% else %}
-                                {{ formDB.db_type(class="form-control", onchange ="change_db_type()") }}
+                                {{ formDB.db_type(id= 'db_type',class="form-control", onchange ="change_db_type()") }}
                             {% endif %}
                     </div>
                 </div>
             </div>
 
-{#            <div class="form-group">#}
-{#                <div class="form-field">#}
-{#                    <div class="select-wrap">#}
-{#                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>#}
-{#                            {% if jsondata['selected'] %}#}
-{#                                {{ formMysqlMongo.existing_db(class="form-control", onchange ="selected_db()", selected="selected") }}#}
-{#                            {% else %}#}
-{#                                {{ formMysqlMongo.existing_db(class="form-control" ) }}#}
-{#                            {% endif %}#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
+            <div class="form-group">
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                {{ formMysqlMongo.existing_db(id= 'existing_db_mysql_mongo',class="form-control" ) }}
+
+                    </div>
+                </div>
+            </div>
 
            <div class="form-group">
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon">
-                            {{ formMysqlMongo.host(class="form-control", placeholder="host (e.g. localhost)") }}
+                            {{ formMysqlMongo.host(id= 'host',class="form-control", placeholder="host (e.g. localhost)") }}
                          </div>
                     </div>
                 </div>
@@ -114,7 +127,7 @@
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon">
-                            {{ formMysqlMongo.port(class="form-control", placeholder="port (e.g. 3306 mysql, 27017 mongo)") }}
+                            {{ formMysqlMongo.port(id= 'port',class="form-control", placeholder="port (e.g. 3306 mysql, 27017 mongo)") }}
                          </div>
                     </div>
                 </div>
@@ -125,7 +138,7 @@
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon">
-                            {{ formMysqlMongo.db_name(class="form-control", placeholder="db_name") }}
+                            {{ formMysqlMongo.db_name(id= 'db_name',class="form-control", placeholder="db_name") }}
                         </div>
                     </div>
                 </div>
@@ -134,7 +147,7 @@
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon">
-                            {{ formMysqlMongo.user_name(class="form-control", placeholder="user_name") }}
+                            {{ formMysqlMongo.user_name(id= 'user_name',class="form-control", placeholder="user_name") }}
                         </div>
                     </div>
                 </div>
@@ -144,7 +157,7 @@
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon">
-                            {{ formMysqlMongo.password(class="form-control", autocomplete="current-password", placeholder="password") }}
+                            {{ formMysqlMongo.password(id= 'password',class="form-control", autocomplete="current-password", placeholder="password") }}
                         </div>
                     </div>
                 </div>
@@ -154,7 +167,7 @@
                 <div class="form-field">
                         <div class="select-wrap">
                             <div class="icon">
-                                {{ formSqlite.existing_db(class="form-control", placeholder="existing_db", type="hidden") }}
+                                {{ formSqlite.existing_db(id= 'existing_db_sqlite',class="form-control", placeholder="existing_db", style="display:None") }}
                             </div>
                         </div>
                 </div>
@@ -167,7 +180,7 @@
                 <div class="form-field">
                         <div class="select-wrap">
                             <div class="icon">
-                                {{ formSqlite.filename(class="form-control", placeholder="filname", type="hidden") }}
+                                {{ formSqlite.filename(id= 'filename', class="form-control", placeholder="filename", type="hidden") }}
                             </div>
                         </div>
                 </div>

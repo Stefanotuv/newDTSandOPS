@@ -45,20 +45,27 @@ def connect():
                 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
                 app.config['dbtype'] = 'sqlite'
                 app.config['connected'] = True
+                return render_template('connected.html')
             else:
                 app.config['dbtype'] = ''
                 app.config['connected'] = False
 
                 pass
+
+
         elif db_type == 'mysql':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
-            # location fo the db, dbname, user and password to be passed as parameter
+                # location fo the db, dbname, user and password to be passed as parameter
                 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'.\
                     format(settingsMysqlMongoForm.user_name.data,settingsMysqlMongoForm.password.data,\
                            settingsMysqlMongoForm.host.data,settingsMysqlMongoForm.port.data,settingsMysqlMongoForm.db_name.data)
+                app.config['dbtype'] = 'mysql'
+                app.config['connected'] = True
+                return render_template('connected.html')
             else:
-                pass
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
         elif db_type == 'mongo':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
@@ -69,17 +76,23 @@ def connect():
                 app.config['MONGOALCHEMY_PORT'] = settingsMysqlMongoForm.port.data
                 app.config['MONGOALCHEMY_USER'] = settingsMysqlMongoForm.user_name.data
                 app.config['MONGOALCHEMY_PASSWORD'] = settingsMysqlMongoForm.password.data
+                app.config['dbtype'] = 'mongo'
+                app.config['connected'] = True
+                return render_template('connected.html')
             else:
-                pass
-
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
+        elif db_type == 'postgress':
+            pass
         else:
             # error?
             pass
+
     else:
+        return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, jsondata=jsondata)
         pass
 
-    return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, \
-                           jsondata=jsondata)
+    return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, jsondata=jsondata)
 
 @db_mng.route('/check_connection')
 # check if the connection is active
