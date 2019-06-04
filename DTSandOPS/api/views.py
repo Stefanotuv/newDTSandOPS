@@ -53,8 +53,8 @@ def query_discipline():
 # return all the core_roles for a given discipline
 def query_macro_role(discipline):
     query = [(q.core_role, q.core_role) for q in \
-     Role.query.filter_by(discipline=discipline).with_entities(Role.core_role).distinct(Role.core_role)]
-    return jsonify(query)
+    Role.query.filter_by(discipline=discipline).with_entities(Role.core_role).distinct(Role.core_role)]
+    return query
     pass
 
 @api_db.route('/query/roles/<discipline>/<core_role>', methods=['GET'])
@@ -62,5 +62,5 @@ def query_macro_role(discipline):
 def query_role(discipline,core_role):
     query = [(q.role, q.role) for q in \
             Role.query.filter_by(discipline=discipline, core_role=core_role).with_entities(Role.role).distinct(Role.role)]
-    return jsonify(query)
+    return query
     pass
