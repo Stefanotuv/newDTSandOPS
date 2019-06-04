@@ -1,13 +1,15 @@
 __author__ = "stefanotuv"
 
-from flask import request, render_template, jsonify, Blueprint, url_for
+from flask import request, render_template, jsonify, Blueprint, url_for, redirect
 from DTSandOPS.main.models.role import Role
 from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.tool_ad import Tool_AD
 from DTSandOPS.main.models.tool import Tool
 from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.forms import RoleSelectionForm, UserForm
+from DTSandOPS.api.views import *
 from flask import current_app as app
+
 
 from DTSandOPS.utilities.global_variable import *
 
@@ -59,7 +61,7 @@ def main_page():
         role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
             Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
 
-        # role_selection_form.discipline.choices = url_for('/query/roles/disciplines')
+        # role_selection_form.discipline.choices = query_discipline()
 
         role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
             Role.query.filter_by(discipline=value_selected[1]). \

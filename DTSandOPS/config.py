@@ -6,8 +6,8 @@ import os
 class Config:
     SECRET_KEY = 'stefanotuv'
 
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://stefano:stefano@localhost/DTSOPS'
-    SQLALCHEMY_DATABASE_URI = ''
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://stefano:stefano@localhost/DTSOPS'
+    # SQLALCHEMY_DATABASE_URI = ''
     user_table = ''
     # SECRET_KEY = os.environ.get('SECRET_KEY')
     # SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')

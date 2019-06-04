@@ -60,7 +60,7 @@
         var role_selected = document.getElementById("role");
 
         discipline = discipline_selected.value;
-        fetch('/core_role/' + discipline).then(function(response) {
+        fetch('/main/core_role/' + discipline).then(function(response) {
 
                 response.json().then(function(data) {
                     var optionHTML = '';
@@ -92,7 +92,7 @@
         discipline = discipline_selected.value;
         core_role = core_role_selected.value;
 
-        fetch('/role/' + discipline + '/' + core_role ).then(function(response) {
+        fetch('/main/role/' + discipline + '/' + core_role ).then(function(response) {
 
                 response.json().then(function(data) {
                     var optionHTML = '';

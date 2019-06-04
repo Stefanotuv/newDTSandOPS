@@ -16,7 +16,7 @@ to understand how to manage the connections to the DB.
 - offer to import dummy data from json
 
 04-06-2019
-- review the main app and simplify by colling the api (to understand if the simple call qould work)
+- review the main app and simplify by calling the api (to understand if the simple call qould work)
 - create the option to check the connection before going to the main page
 - review when to connect and make the authorisations
 - review how modify the connection page to:

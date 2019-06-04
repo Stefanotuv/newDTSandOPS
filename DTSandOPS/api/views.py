@@ -44,7 +44,8 @@ def tables(table_name):
 # return all the discipline in the table
 def query_discipline():
     query = [(q.discipline, q.discipline) for q in Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
-    return jsonify(query)
+    # return jsonify(query)
+    return query
     pass
 
 
