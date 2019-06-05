@@ -169,7 +169,7 @@
             {#load the previous saved user table info#}
         function load_data_backend(){
             debugger;
-            theUrl = '/user_table';
+            theUrl = '/main/user_table';
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open( "GET", theUrl, false );
             xmlHttp.send( null );
@@ -212,7 +212,7 @@
         {#there is a sync call to wait for the results, the fetch call didnt work#}
         function query_ad(tool,country){
 
-          theUrl = '/tool_AD/' + tool + '/' + country;
+          theUrl = '/main/tool_AD/' + tool + '/' + country;
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.open( "GET", theUrl, false );
           xmlHttp.send( null );
@@ -392,7 +392,7 @@
                         contentType: 'application/json',
                         data: JSON.stringify(data),
                         dataType: 'json',
-                        url: '/user_table',
+                        url: '/main/user_table',
                         success: function (e) {
                             console.log(e);
                             window.location = "/user_table";

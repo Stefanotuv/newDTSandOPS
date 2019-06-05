@@ -1,0 +1,43 @@
+
+body {
+  font-family: "Lato", sans-serif;
+}
+
+
+
+/*.table-container{*/
+/*    margin-left: 300px;*/
+/*}*/
+
+
+.sidebar_left {
+
+  background-color: lightblue;
+  margin-top: 6px;
+  padding-top: 40px;
+
+}
+
+.sidebar_right {
+
+  background-color: lightblue;
+  margin-top: 6px;
+  padding-top: 40px;
+
+}
+
+.block{
+  margin-top: 6px;
+  padding-top: 40px;
+}
+
+.main {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #818181;
+  display: block;
+}
+
+
+

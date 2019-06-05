@@ -48,7 +48,6 @@ def query_discipline():
     return query
     pass
 
-
 @api_db.route('/query/core_roles/<discipline>', methods=['GET'])
 # return all the core_roles for a given discipline
 def query_macro_role(discipline):
@@ -62,5 +61,13 @@ def query_macro_role(discipline):
 def query_role(discipline,core_role):
     query = [(q.role, q.role) for q in \
             Role.query.filter_by(discipline=discipline, core_role=core_role).with_entities(Role.role).distinct(Role.role)]
+    return query
+    pass
+
+@api_db.route('/query/countries', methods=['GET'])
+# return all the roles for a given core_role and discipline
+def query_countries():
+    query = [(q.country_code, q.country_code) for q in \
+                Country.query.with_entities(Country.country_code)]
     return query
     pass

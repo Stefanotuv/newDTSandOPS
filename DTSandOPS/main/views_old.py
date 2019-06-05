@@ -56,6 +56,22 @@ def main_page():
 
         jsondata = {'column_name': column_name, 'tools': tool_array, 'full_tools': full_tool_array, 'selected': value_selected[1:] }
 
+
+        # role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
+        #     Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
+
+        # role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
+        #     Role.query.filter_by(discipline=value_selected[1]). \
+        #             with_entities(Role.core_role).distinct(Role.core_role)]
+
+        # role_selection_form.role.choices = [(q.role, q.role) for q in \
+        #     Role.query.filter_by(discipline=value_selected[1], \
+        #         core_role=value_selected[2]). \
+        #             with_entities(Role.role).distinct(Role.role)]
+
+        # user_form.country.choices = [(q.country_code, q.country_code) for q in \
+        #     Country.query.with_entities(Country.country_code)]
+
         role_selection_form.discipline.choices = query_discipline()
         role_selection_form.core_role.choices = query_macro_role(value_selected[1])
         role_selection_form.role.choices = query_role(value_selected[1], value_selected[2])
@@ -63,24 +79,20 @@ def main_page():
 
     else:
 
-        role_selection_form.discipline.choices = query_discipline()
-        role_selection_form.core_role.choices = query_macro_role(role_selection_form.discipline.choices[0][0])
-        role_selection_form.role.choices = query_role(role_selection_form.discipline.choices[0][0], role_selection_form.core_role.choices[0][0])
-        user_form.country.choices = query_countries()
-        # role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
-        #     Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
+        role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
+            Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
 
+        role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
+            Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0]).\
+                with_entities(Role.core_role).distinct(Role.core_role)]
 
-        # role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
-        #     Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0]).\
-        #         with_entities(Role.core_role).distinct(Role.core_role)]
+        role_selection_form.role.choices = [(q.role, q.role) for q in \
+            Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0], \
+                core_role = role_selection_form.core_role.choices[0][0]).\
+                    with_entities(Role.role).distinct(Role.role)]
 
-        # role_selection_form.role.choices = [(q.role, q.role) for q in \
-        #     Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0], \
-        #         core_role = role_selection_form.core_role.choices[0][0]).\
-        #             with_entities(Role.role).distinct(Role.role)]
-
-
+        user_form.country.choices = [(q.country_code, q.country_code) for q in \
+            Country.query.with_entities(Country.country_code)]
 
         # add the initial values to the table --------------------------------------------
         toolsIds = [ q.tool_id for q in Role_Tool.query.filter_by(role_id=1).with_entities(Role_Tool.tool_id)]
@@ -124,7 +136,6 @@ def role_load(discipline_selected,core_role_selected):
     [role_array.append({'id': rol.role, 'name': rol.role}) for rol in role]
 
     return jsonify({'role': role_array})
-
 
 @main.route('/tool_AD/<tool>/<country>')
 # used to extract the AD for the tool based on the country
