@@ -39,7 +39,6 @@ def tables(table_name):
 
     return json_full_values
 
-
 @api_db.route('/query/disciplines', methods = ['GET'])
 # return all the discipline in the table
 def query_discipline():
@@ -71,3 +70,26 @@ def query_countries():
                 Country.query.with_entities(Country.country_code)]
     return query
     pass
+
+@api_db.route('/query/roleid/<discipline>/<core_role>/<role>', methods=['GET'])
+
+def query_roleid(discipline, core_role, role):
+    query = [ q.role_id for q in Role.query.filter_by(discipline=discipline,core_role = core_role, role = role).with_entities(Role.role_id)]
+    return query
+    pass
+
+# toolsIds
+@api_db.route('/query/tool_id/< >', methods=['GET'])
+
+def query_toolid(role_id):
+    query = [q.tool_id for q in Role_Tool.query.filter_by(role_id=role_id).with_entities(Role_Tool.tool_id)]
+    return query
+    pass
+
+# @api_db.route('/query/tool_values/<tool_ids>', methods=['GET'])
+# def query_toolid(tool_ids):
+#     query = [ q for q in Tool.query.filter(Tool.tool_id.in_(tool_ids))]
+#     return query
+#     pass
+
+

@@ -36,18 +36,20 @@ def main_page():
     # The initial value are for the first option on the Discipline
     if request.method == 'POST':
 
-
         keys = [key for key in request.form.keys()]
         value_selected = [request.form[key] for key in keys]
         Json_users_data = app.config['user_table']
 
-
         # the file for the table requires only the ID country and role a function to be created
         json_user_table = Json_users_data_reduced(Json_users_data)
 
+        # use the many to many table to get all tool values corresponding the role id selected
+        roleId = query_roleid(value_selected[1],value_selected[2],value_selected[3])
+        toolsIds = query_toolid(roleId[0])
 
-        roleId = [ q.role_id for q in Role.query.filter_by(discipline=value_selected[1],core_role = value_selected[2], role = value_selected[3]).with_entities(Role.role_id)]
-        toolsIds = [ q.tool_id for q in Role_Tool.query.filter_by(role_id=roleId[0]).with_entities(Role_Tool.tool_id)]
+        # roleId = [ q.role_id for q in Role.query.filter_by(discipline=value_selected[1],core_role = value_selected[2], role = value_selected[3]).with_entities(Role.role_id)]
+        # toolsIds = [q.tool_id for q in Role_Tool.query.filter_by(role_id=roleId[0]).with_entities(Role_Tool.tool_id)]
+
         tool_values = [ q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
         column_name = Tool.columns
         tool_array = []
@@ -62,29 +64,19 @@ def main_page():
         user_form.country.choices = query_countries()
 
     else:
-
+        # load the value for the menu to select the role
         role_selection_form.discipline.choices = query_discipline()
         role_selection_form.core_role.choices = query_macro_role(role_selection_form.discipline.choices[0][0])
         role_selection_form.role.choices = query_role(role_selection_form.discipline.choices[0][0], role_selection_form.core_role.choices[0][0])
         user_form.country.choices = query_countries()
-        # role_selection_form.discipline.choices = [(q.discipline, q.discipline) for q in \
-        #     Role.query.with_entities(Role.discipline).distinct(Role.discipline)]
-
-
-        # role_selection_form.core_role.choices = [(q.core_role, q.core_role) for q in \
-        #     Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0]).\
-        #         with_entities(Role.core_role).distinct(Role.core_role)]
-
-        # role_selection_form.role.choices = [(q.role, q.role) for q in \
-        #     Role.query.filter_by(discipline = role_selection_form.discipline.choices[0][0], \
-        #         core_role = role_selection_form.core_role.choices[0][0]).\
-        #             with_entities(Role.role).distinct(Role.role)]
-
-
 
         # add the initial values to the table --------------------------------------------
-        toolsIds = [ q.tool_id for q in Role_Tool.query.filter_by(role_id=1).with_entities(Role_Tool.tool_id)]
-        tool_values = [ q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
+        toolsIds = query_toolid(1)
+
+        # toolsIds = [ q.tool_id for q in Role_Tool.query.filter_by(role_id=1).with_entities(Role_Tool.tool_id)]
+
+
+        tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
         column_name = Tool.columns
         tool_array = []
         [tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor })\
