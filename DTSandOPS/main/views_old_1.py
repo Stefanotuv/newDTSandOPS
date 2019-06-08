@@ -11,7 +11,6 @@ from DTSandOPS.api.views import *
 from flask import current_app as app
 import requests
 import json
-from urllib.parse import parse_qs
 
 
 from DTSandOPS.utilities.global_variable import *
@@ -29,12 +28,11 @@ def main_page():
     user_form = UserForm()
     Json_users_data = ''
     json_user_table = ''
-    query_result = send_query_post("http://127.0.0.1:5000/api/query", "Tool", filters=None, output=None, distinct=None)
-    full_tool_values = [q for q in query_result]
+    full_tool_values = [q for q in Tool.query.all()]
+    # full_tool_values = query_tables("")
     full_tool_array = []
-    [full_tool_array.append({'id': tool['tool_id'], 'name': tool['tool_name'], 'vendor': tool['tool_vendor']}) \
+    [full_tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor}) \
      for tool in full_tool_values]
-
 
     # this is the intialisation of the page.
     # The initial value are for the first option on the Discipline
@@ -49,7 +47,6 @@ def main_page():
 
         # use the many to many table to get all tool values corresponding the role id selected
         roleId = query_roleid(value_selected[1],value_selected[2],value_selected[3])
-        # roleId =
         toolsIds = query_toolid(roleId[0])
 
         tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
@@ -180,7 +177,7 @@ def Json_users_data_reduced(Json_data_list):
     return Json_reduced
 
 
-def send_query_post(api_address,table_name, filters=None, output=None, distinct=None):
+def create_query_post(api_address,table_name, filters=None, output=None, distinct=None):
 
     json_query = {
 
@@ -199,8 +196,8 @@ def send_query_post(api_address,table_name, filters=None, output=None, distinct=
     }
 
     resp =  requests.post(api_address, json=json_query)
-    return resp.json()
-    # return (resp.text, resp.status_code, resp.headers.items())
+
+    return (resp.text, resp.status_code, resp.headers.items())
 
 @main.route('/testapi')
 def testapi():
@@ -208,8 +205,8 @@ def testapi():
     # return create_query_post("http://127.0.0.1:5000/api/query","select_all_from_table","tool")
     # return create_query_post("http://127.0.0.1:5000/api/query","select_filtered_return","role",
     #                          [{"discipline":"D1"},{"core_role":"MR1"}],["role"],["role"])
-    return jsonify(send_query_post("http://127.0.0.1:5000/api/query", "Role",
-                             [{"discipline": "D1"}, {"core_role": "MR1"}]))
+    return create_query_post("http://127.0.0.1:5000/api/query", "Role",
+                             [{"discipline": "D1"}, {"core_role": "MR1"}])
     pass
 
 

@@ -7,6 +7,7 @@ from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.models.role import Role
 from sqlalchemy.sql.expression import or_, and_
 import sys
+import json
 
 from flask import Blueprint, jsonify, request
 
@@ -175,8 +176,53 @@ def query_tables_generic(table_name, columns_filters,columns_entities,columns_di
                 # dict[str(ent)] = q.ent
                 dict[str(ent)] = getattr(q,str(ent))
             full_values.append(dict)
-    json_full_values = jsonify(full_values)
+    json_full_values = json.dumps(full_values)
+    # json_full_values = jsonify(full_values)
     # print(json_full_values)
+    return json_full_values
+
+def query_tables_generic_list(table_name, columns_filters,columns_entities,columns_distinct):
+    # to add: verify if the table exist to avoid errors
+
+    # parameters for the queries
+    full_values= []
+    filters= []
+    entities= []
+    distinct = []
+
+    if columns_filters is not None:
+        [filters.append(
+            getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0])) for item
+         in columns_filters]
+
+    if columns_entities is not None:
+        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_entities]
+
+    if columns_distinct is not None:
+        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_distinct]
+
+    # prepare the query
+    # the query is different based on with entities. if entities is None, the query wont select nay column
+    if columns_entities is not None:
+        que = getattr((sys.modules[__name__], table_name)).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
+        # create the output only for the entities columns
+        for q in que:
+            dict = {}
+            for ent in entities:
+                dict[str(ent)] = getattr(q,str(ent))
+            full_values.append(dict)
+    else:
+        que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).distinct(*distinct)
+        # create the output for all columns
+        for q in que:
+            dict = {}
+            for ent in getattr(sys.modules[__name__], table_name).columns:
+                # dict[str(ent)] = q.ent
+                dict[str(ent)] = getattr(q,str(ent))
+            full_values.append(dict)
+    # return full_values
+    json_full_values = jsonify(full_values)
+    print(json_full_values)
     return json_full_values
 
 
