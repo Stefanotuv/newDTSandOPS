@@ -96,14 +96,8 @@ def query_toolid(role_id):
     return query
     pass
 
-# @api_db.route('/query/tool_values/<tool_ids>', methods=['GET'])
-# def query_toolid(tool_ids):
-#     query = [ q for q in Tool.query.filter(Tool.tool_id.in_(tool_ids))]
-#     return query
-#     pass
 
 @api_db.route('/query', methods=['POST'])
-
 def query_generic():
 
     # this query receive a Json to create any type of query to the db on the back-end
@@ -142,74 +136,6 @@ def query_generic():
 
 
 # detailed database query
-
-def query_tables_generic_(table_name, columns_filters,columns_entities,columns_distinct):
-
-    full_values = []
-    filters = []
-    entities = []
-    distinct = []
-
-    if (table_name == "tool"):
-        # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
-        que = Tool.query.filter(getattr(Tool, key) == value)
-        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
-         que]
-
-    elif (table_name == "role"):
-        # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
-        if columns_filters is not None:
-            [filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0])) for item in columns_filters]
-            # for item in columns_filters:
-            #     filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0]))
-
-        if columns_entities is not None:
-            [entities.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_entities]
-            # for item in columns_entities:
-            #     entities.append(getattr(getattr(sys.modules[__name__], "Role"),item))
-
-        if columns_distinct is not None:
-            [distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_distinct]
-            # for item in columns_distinct:
-            #     distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item))
-
-
-        # que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
-        que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).distinct(
-            *distinct)
-        # que = Role.query.filter(getattr(Role, key) == value)
-        [full_values.append(
-            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
-         que]
-
-    elif (table_name == "role_tool"):
-        # que = Role_Tool.query.filter(Role_Tool.__getattribute__(Role_Tool, key) == value)
-        que = Role_Tool.query.filter(getattr(Role_Tool, key) == value)
-        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in que]
-
-    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
-        # que = Tool_AD.query.filter(Tool_AD.__getattribute__(Tool_AD, key) == value)
-        que = Tool_AD.query.filter(getattr(Tool_AD, key) == value)
-        [full_values.append(
-            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
-             'country_code': q.country_code}) for q in que]
-
-    elif (table_name == "country"):
-        # que = Country.query.filter(Country.__getattribute__(Country, key) == value)
-        que = Country.query.filter(getattr(Country, key) == value)
-        [full_values.append(
-            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
-                que]
-
-    else:
-        return jsonify({"message": "table selected not available"})
-        pass
-
-    json_full_values = jsonify(full_values)
-    # print(json_full_values)
-
-    return json_full_values
-
 def query_tables_generic(table_name, columns_filters,columns_entities,columns_distinct):
     # to add: verify if the table exist to avoid errors
 
