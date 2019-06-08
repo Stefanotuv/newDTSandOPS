@@ -1,8 +1,14 @@
+
+//Example of the generic query structure for the database
+//this will be used to create the json to be post to the api
 {
   "query_type": [
     "select_all_from_table",
-    "select_filtered"
+    "select_filtered",
+    "select_return",
+    "select_filtered_return"
   ],
+
   "table_name": [
     "role",
     "tool",
@@ -10,10 +16,16 @@
     "tool_AD",
     "country"
   ],
+
   "filters": [
     { "column_name_1" : "value_1" },
     { "column_name_2" : "value_2" },
     { "column_name_n" : "value_n" }
   ],
-  "string": "Hello World"
+
+  "output":[
+      "column_name_1",
+      "column_name_2",
+      "column_name_n"
+  ]
 }

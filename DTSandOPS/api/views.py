@@ -6,35 +6,43 @@ from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.models.role import Role
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 api_db = Blueprint('api_db', __name__, template_folder='templates', url_prefix='/api')
 
-@api_db.route('/tables/<table_name>', methods = ['GET'])
+@api_db.route('/query/tables/<table_name>', methods=['GET'])
 # return all values in a table
-def tables(table_name):
+def query_tables(table_name):
     full_values = []
-    full_values
 
-    if(table_name=="tool"):
-        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in Tool.query.all()]
+    if (table_name == "tool"):
+        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
+         Tool.query.all()]
 
-    elif(table_name=="role"):
-        [full_values.append({'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in Role.query.all()]
+    elif (table_name == "role"):
+        [full_values.append(
+            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
+         Role.query.all()]
 
-    elif(table_name=="role_tool"):
+    elif (table_name == "role_tool"):
         temp = Role_Tool.query.all()
         [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in temp]
 
-    elif((table_name=="tool_AD") or (table_name=="tool_ad")):
-        [full_values.append({'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name, 'country_code': q.country_code}) for q in Tool_AD.query.all()]
+    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
+        [full_values.append(
+            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
+             'country_code': q.country_code}) for q in Tool_AD.query.all()]
 
-    elif (table_name=="country"):
-        [full_values.append({'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in Country.query.all()]
+    elif (table_name == "country"):
+        [full_values.append(
+            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
+         Country.query.all()]
+
     else:
+        return jsonify({"message": "table selected not available"})
         pass
-    json_full_values = jsonify(full_values)
 
+    json_full_values = jsonify(full_values)
     # print(json_full_values)
 
     return json_full_values
@@ -79,7 +87,7 @@ def query_roleid(discipline, core_role, role):
     pass
 
 # toolsIds
-@api_db.route('/query/tool_id/< >', methods=['GET'])
+@api_db.route('/query/tool_id/<role_id>', methods=['GET'])
 
 def query_toolid(role_id):
     query = [q.tool_id for q in Role_Tool.query.filter_by(role_id=role_id).with_entities(Role_Tool.tool_id)]
@@ -92,4 +100,136 @@ def query_toolid(role_id):
 #     return query
 #     pass
 
+@api_db.route('/query', methods=['POST'])
+
+def query_generic():
+
+    # this query receive a Json to create any type of query to the db on the back-end
+
+    # test if the request is json
+    # if yes get the corresponding query from the json data if not return invalid message
+
+    if request.is_json:
+        # elaborate the json data
+        query_type = request.json['query_type']
+
+        if query_type == "select_all_from_table":
+            # TO ADD: check if the other fields in the query are empty
+            return query_tables_all(request.json['table_name'])
+
+            pass
+        elif query_type == "select_filtered":
+            # TO ADD: check if the filter is not field in the query are empty
+
+            return query_tables_filtered(request.json['table_name'], request.json['filters'])
+
+            pass
+
+        elif query_type == "select_return":
+            pass
+
+        elif query_type == "select_filtered_return":
+            pass
+
+        else :
+            return "not valid json query request"
+            pass
+
+        pass
+    else:
+        return "not valid json request"
+
+
+    pass
+
+
+# detailed database query
+
+def query_tables_all(table_name):
+    full_values = []
+
+    if (table_name == "tool"):
+        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
+         Tool.query.all()]
+
+    elif (table_name == "role"):
+        [full_values.append(
+            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
+         Role.query.all()]
+
+    elif (table_name == "role_tool"):
+        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in Role_Tool.query.all()]
+
+    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
+        [full_values.append(
+            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
+             'country_code': q.country_code}) for q in Tool_AD.query.all()]
+
+    elif (table_name == "country"):
+        [full_values.append(
+            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
+         Country.query.all()]
+
+    else:
+        return jsonify({"message": "table selected not available"})
+        pass
+
+    json_full_values = jsonify(full_values)
+    # print(json_full_values)
+
+    return json_full_values
+
+def query_tables_filtered(table_name, columns_filters):
+    full_values = []
+    filters = ""
+
+    for item in columns_filters:
+        key = list(item.keys())[0]
+        value = list(item.values())[0]
+        # string = "{}={},".format(key, value)
+        # filters += string
+
+    # [filters.join("{}={},".format(item.keys(), item.values())) for item in columns_filters]
+    # filters_by = filters[0:(len(filters)-1)]
+
+    if (table_name == "tool"):
+        # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
+        que = Tool.query.filter(getattr(Tool, key) == value)
+        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
+         que]
+
+    elif (table_name == "role"):
+        # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
+        que = Role.query.filter(getattr(Role, key) == value)
+        [full_values.append(
+            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
+         que]
+
+    elif (table_name == "role_tool"):
+        # que = Role_Tool.query.filter(Role_Tool.__getattribute__(Role_Tool, key) == value)
+        que = Role_Tool.query.filter(getattr(Role_Tool, key) == value)
+        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in que]
+
+    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
+        # que = Tool_AD.query.filter(Tool_AD.__getattribute__(Tool_AD, key) == value)
+        que = Tool_AD.query.filter(getattr(Tool_AD, key) == value)
+        [full_values.append(
+            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
+             'country_code': q.country_code}) for q in que]
+
+    elif (table_name == "country"):
+        # que = Country.query.filter(Country.__getattribute__(Country, key) == value)
+        que = Country.query.filter(getattr(Country, key) == value)
+        [full_values.append(
+            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
+                que]
+
+    else:
+        return jsonify({"message": "table selected not available"})
+        pass
+
+    json_full_values = jsonify(full_values)
+    # print(json_full_values)
+
+    return json_full_values
 

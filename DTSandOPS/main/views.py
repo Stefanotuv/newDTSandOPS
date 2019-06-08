@@ -9,6 +9,8 @@ from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.forms import RoleSelectionForm, UserForm
 from DTSandOPS.api.views import *
 from flask import current_app as app
+import requests
+import json
 
 
 from DTSandOPS.utilities.global_variable import *
@@ -24,10 +26,10 @@ def allowed_file(filename):
 def main_page():
     role_selection_form = RoleSelectionForm()
     user_form = UserForm()
-    # login_manager = LoginManager()
     Json_users_data = ''
     json_user_table = ''
     full_tool_values = [q for q in Tool.query.all()]
+    # full_tool_values = query_tables("")
     full_tool_array = []
     [full_tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor}) \
      for tool in full_tool_values]
@@ -47,10 +49,7 @@ def main_page():
         roleId = query_roleid(value_selected[1],value_selected[2],value_selected[3])
         toolsIds = query_toolid(roleId[0])
 
-        # roleId = [ q.role_id for q in Role.query.filter_by(discipline=value_selected[1],core_role = value_selected[2], role = value_selected[3]).with_entities(Role.role_id)]
-        # toolsIds = [q.tool_id for q in Role_Tool.query.filter_by(role_id=roleId[0]).with_entities(Role_Tool.tool_id)]
-
-        tool_values = [ q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
+        tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
         column_name = Tool.columns
         tool_array = []
         [tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor })\
@@ -73,16 +72,12 @@ def main_page():
         # add the initial values to the table --------------------------------------------
         toolsIds = query_toolid(1)
 
-        # toolsIds = [ q.tool_id for q in Role_Tool.query.filter_by(role_id=1).with_entities(Role_Tool.tool_id)]
-
-
         tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
         column_name = Tool.columns
         tool_array = []
         [tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor })\
                             for tool in tool_values]
         jsondata = {'column_name': column_name, 'tools': tool_array, 'full_tools': full_tool_array, 'selected': [] }
-        #----------------------------------------------------------------------------------------
 
     return render_template('main_page_new_11.html', form = role_selection_form, user_form=user_form, jsondata=jsondata, json_user_table= json_user_table)
 
@@ -174,10 +169,41 @@ def tables(table_name):
     return json_full_values
     pass
 
-
 def Json_users_data_reduced(Json_data_list):
     Json_reduced = []
 
     [Json_reduced.append({'id' : 'id', 'user_id': Json_data['user_id'], 'role': Json_data['role'], 'country': Json_data['country']}) for Json_data in Json_data_list]
 
     return Json_reduced
+
+
+def create_query_post(api_address,query_type, table_name, filters=None, output=None):
+
+    json_query = {
+
+        # options: select_all_from_table, select_filtered, select_return , select_filtered_return
+        "query_type": query_type,
+
+        # options: roles, tools, roles_tools, tool_ad, countries
+        "table_name": table_name,
+
+        # filters for the select query. their are given in pair as a dictionary
+        # column : value
+        "filters": filters,
+
+        # select the list of columns that are wanted as an output
+        "output": output
+    }
+
+    resp =  requests.post(api_address, json=json_query)
+
+    return (resp.text, resp.status_code, resp.headers.items())
+
+@main.route('/testapi')
+def testapi():
+
+    # return create_query_post("http://127.0.0.1:5000/api/query","select_all_from_table","tool")
+    return create_query_post("http://127.0.0.1:5000/api/query","select_filtered","role",[{"discipline":"D1"}])
+    pass
+
+

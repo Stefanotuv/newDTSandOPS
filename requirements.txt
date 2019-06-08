@@ -12,3 +12,4 @@ Flask_Login==0.4.1
 flask_sqlalchemy==2.4.0
 pymysql==0.9.3
 flask_bcrypt==0.7.1
+Requests
