@@ -177,7 +177,7 @@ def Json_users_data_reduced(Json_data_list):
     return Json_reduced
 
 
-def create_query_post(api_address,query_type, table_name, filters=None, output=None):
+def create_query_post(api_address,query_type, table_name, filters=None, output=None, distinct=None):
 
     json_query = {
 
@@ -192,7 +192,10 @@ def create_query_post(api_address,query_type, table_name, filters=None, output=N
         "filters": filters,
 
         # select the list of columns that are wanted as an output
-        "output": output
+        "output": output,
+
+        # select the list of columns that are wanted as an output
+        "distinct": distinct
     }
 
     resp =  requests.post(api_address, json=json_query)
@@ -203,7 +206,10 @@ def create_query_post(api_address,query_type, table_name, filters=None, output=N
 def testapi():
 
     # return create_query_post("http://127.0.0.1:5000/api/query","select_all_from_table","tool")
-    return create_query_post("http://127.0.0.1:5000/api/query","select_filtered","role",[{"discipline":"D1"}])
+    return create_query_post("http://127.0.0.1:5000/api/query","select_filtered_return","role",
+                             [{"discipline":"D1"},{"core_role":"MR1"}],["role"],["role"])
+    # return create_query_post("http://127.0.0.1:5000/api/query", "select_filtered_return", "role",
+    #                          [{"discipline": "D1"}, {"core_role": "MR1"}])
     pass
 
 

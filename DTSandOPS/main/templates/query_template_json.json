@@ -27,5 +27,11 @@
       "column_name_1",
       "column_name_2",
       "column_name_n"
+  ],
+
+  "distinct": [
+      "column_name_1",
+      "column_name_2",
+      "column_name_n"
   ]
 }

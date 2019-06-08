@@ -130,9 +130,6 @@ def query_generic():
             pass
 
         elif query_type == "select_filtered_return":
-            return query_tables_filtered_entities_distinct(request.json['table_name'], request.json['filters'], request.json['output'],
-                                         request.json['distinct'])
-
             pass
 
         else :
@@ -204,71 +201,6 @@ def query_tables_filtered(table_name, columns_filters):
             filters.append(getattr(Role, list(item.keys())[0]) == (list(item.values())[0]))
 
         que = Role.query.filter(and_(*filters))
-        # que = Role.query.filter(getattr(Role, key) == value)
-        [full_values.append(
-            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
-         que]
-
-    elif (table_name == "role_tool"):
-        # que = Role_Tool.query.filter(Role_Tool.__getattribute__(Role_Tool, key) == value)
-        que = Role_Tool.query.filter(getattr(Role_Tool, key) == value)
-        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in que]
-
-    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
-        # que = Tool_AD.query.filter(Tool_AD.__getattribute__(Tool_AD, key) == value)
-        que = Tool_AD.query.filter(getattr(Tool_AD, key) == value)
-        [full_values.append(
-            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
-             'country_code': q.country_code}) for q in que]
-
-    elif (table_name == "country"):
-        # que = Country.query.filter(Country.__getattribute__(Country, key) == value)
-        que = Country.query.filter(getattr(Country, key) == value)
-        [full_values.append(
-            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
-                que]
-
-    else:
-        return jsonify({"message": "table selected not available"})
-        pass
-
-    json_full_values = jsonify(full_values)
-    # print(json_full_values)
-
-    return json_full_values
-
-def query_tables_filtered_entities_distinct(table_name, columns_filters,column_entities,column_distinct):
-    full_values = []
-    filters = []
-    entities = []
-    distinct = []
-
-    for item in columns_filters:
-        key = list(item.keys())[0]
-        value = list(item.values())[0]
-
-
-    if (table_name == "tool"):
-        # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
-        que = Tool.query.filter(getattr(Tool, key) == value)
-        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
-         que]
-
-    elif (table_name == "role"):
-        # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
-        for item in columns_filters:
-            filters.append(getattr(Role, list(item.keys())[0]) == (list(item.values())[0]))
-
-        if column_entities is not None:
-            for item in column_entities:
-                entities.append(getattr(Role,item))
-                pass
-        if column_distinct is not None:
-            for item in column_distinct:
-                distinct.append(getattr(Role, item))
-                pass
-
-        que = Role.query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
         # que = Role.query.filter(getattr(Role, key) == value)
         [full_values.append(
             {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
