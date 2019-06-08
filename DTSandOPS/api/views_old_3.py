@@ -113,42 +113,26 @@ def query_generic():
 
     if request.is_json:
 
-        if request.json['table_name'] is not None:
-            table_name = request.json['table_name']
-        else:
-            table_name = None
-
-        if request.json['filters'] is not None:
-            filters = request.json['filters']
-        else:
-            filters = None
-
-        if request.json['output'] is not None:
-            output = request.json['output']
-        else:
-            output = None
-
-        if request.json['distinct'] is not None:
-            distinct = request.json['distinct']
-        else:
-            distinct = None
-
-        return query_tables_generic(table_name, filters, output ,
-                                         distinct)
+        return query_tables_generic(request.json['table_name'], request.json['filters'], request.json['output'],
+                                         request.json['distinct'])
     else:
         return "not valid json request"
+
 
     pass
 
 
 # detailed database query
 
-def query_tables_generic_(table_name, columns_filters,columns_entities,columns_distinct):
+def query_tables_generic(table_name, columns_filters,columns_entities,columns_distinct):
 
     full_values = []
     filters = []
     entities = []
     distinct = []
+
+    # import sys
+    # getattr(sys.modules[__name__], "Foo")
 
     if (table_name == "tool"):
         # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
@@ -159,24 +143,23 @@ def query_tables_generic_(table_name, columns_filters,columns_entities,columns_d
     elif (table_name == "role"):
         # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
         if columns_filters is not None:
-            [filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0])) for item in columns_filters]
-            # for item in columns_filters:
-            #     filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0]))
+            # [filters.append(getattr(Role, list(item.keys())[0]) == (list(item.values())[0])) for item in columns_filters]
+            for item in columns_filters:
+                filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0]))
 
         if columns_entities is not None:
-            [entities.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_entities]
-            # for item in columns_entities:
-            #     entities.append(getattr(getattr(sys.modules[__name__], "Role"),item))
+            # [entities.append(getattr(Role, item)) for item in columns_entities]
+            for item in columns_entities:
+                entities.append(getattr(getattr(sys.modules[__name__], "Role"),item))
 
         if columns_distinct is not None:
-            [distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_distinct]
-            # for item in columns_distinct:
-            #     distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item))
+            # [distinct.append(getattr(Role, item)) for item in columns_distinct]
+            for item in columns_distinct:
+                distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item))
 
 
-        # que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
-        que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).distinct(
-            *distinct)
+        que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters))
+            # .with_entities(*entities).distinct(*distinct)
         # que = Role.query.filter(getattr(Role, key) == value)
         [full_values.append(
             {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
@@ -209,51 +192,3 @@ def query_tables_generic_(table_name, columns_filters,columns_entities,columns_d
     # print(json_full_values)
 
     return json_full_values
-
-def query_tables_generic(table_name, columns_filters,columns_entities,columns_distinct):
-    # to add: verify if the table exist to avoid errors
-
-    # parameters for the queries
-    full_values= []
-    filters= []
-    entities= []
-    distinct = []
-
-    if columns_filters is not None:
-        [filters.append(
-            getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0])) for item
-         in columns_filters]
-
-    if columns_entities is not None:
-        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_entities]
-
-    if columns_distinct is not None:
-        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_distinct]
-
-    # prepare the query
-    # the query is different based on with entities. if entities is None, the query wont select nay column
-    if columns_entities is not None:
-        que = getattr((sys.modules[__name__], table_name)).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
-        # create the output only for the entities columns
-        for q in que:
-            dict = {}
-            for ent in entities:
-                dict[str(ent)] = getattr(q,str(ent))
-            full_values.append(dict)
-    else:
-        que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).distinct(*distinct)
-        # create the output for all columns
-        for q in que:
-            dict = {}
-            for ent in getattr(sys.modules[__name__], table_name).columns:
-                # dict[str(ent)] = q.ent
-                dict[str(ent)] = getattr(q,str(ent))
-            full_values.append(dict)
-    json_full_values = jsonify(full_values)
-    # print(json_full_values)
-    return json_full_values
-
-
-
-
-

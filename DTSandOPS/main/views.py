@@ -177,12 +177,9 @@ def Json_users_data_reduced(Json_data_list):
     return Json_reduced
 
 
-def create_query_post(api_address,query_type, table_name, filters=None, output=None, distinct=None):
+def create_query_post(api_address,table_name, filters=None, output=None, distinct=None):
 
     json_query = {
-
-        # options: select_all_from_table, select_filtered, select_return , select_filtered_return
-        "query_type": query_type,
 
         # options: roles, tools, roles_tools, tool_ad, countries
         "table_name": table_name,
@@ -206,10 +203,10 @@ def create_query_post(api_address,query_type, table_name, filters=None, output=N
 def testapi():
 
     # return create_query_post("http://127.0.0.1:5000/api/query","select_all_from_table","tool")
-    return create_query_post("http://127.0.0.1:5000/api/query","select_filtered_return","role",
-                             [{"discipline":"D1"},{"core_role":"MR1"}],["role"],["role"])
-    # return create_query_post("http://127.0.0.1:5000/api/query", "select_filtered_return", "role",
-    #                          [{"discipline": "D1"}, {"core_role": "MR1"}])
+    # return create_query_post("http://127.0.0.1:5000/api/query","select_filtered_return","role",
+    #                          [{"discipline":"D1"},{"core_role":"MR1"}],["role"],["role"])
+    return create_query_post("http://127.0.0.1:5000/api/query", "Role",
+                             [{"discipline": "D1"}, {"core_role": "MR1"}])
     pass
 
 

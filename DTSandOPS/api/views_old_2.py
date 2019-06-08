@@ -6,7 +6,6 @@ from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.models.role import Role
 from sqlalchemy.sql.expression import or_, and_
-import sys
 
 from flask import Blueprint, jsonify, request
 
@@ -112,43 +111,86 @@ def query_generic():
     # if yes get the corresponding query from the json data if not return invalid message
 
     if request.is_json:
+        # elaborate the json data
+        query_type = request.json['query_type']
 
-        if request.json['table_name'] is not None:
-            table_name = request.json['table_name']
-        else:
-            table_name = None
+        if query_type == "select_all_from_table":
+            # TO ADD: check if the other fields in the query are empty
+            return query_tables_all(request.json['table_name'])
 
-        if request.json['filters'] is not None:
-            filters = request.json['filters']
-        else:
-            filters = None
+            pass
+        elif query_type == "select_filtered":
+            # TO ADD: check if the filter is not field in the query are empty
 
-        if request.json['output'] is not None:
-            output = request.json['output']
-        else:
-            output = None
+            return query_tables_filtered(request.json['table_name'], request.json['filters'])
 
-        if request.json['distinct'] is not None:
-            distinct = request.json['distinct']
-        else:
-            distinct = None
+            pass
 
-        return query_tables_generic(table_name, filters, output ,
-                                         distinct)
+        elif query_type == "select_return":
+            pass
+
+        elif query_type == "select_filtered_return":
+            return query_tables_filtered_entities_distinct(request.json['table_name'], request.json['filters'], request.json['output'],
+                                         request.json['distinct'])
+
+            pass
+
+        else :
+            return "not valid json query request"
+            pass
+
+        pass
     else:
         return "not valid json request"
+
 
     pass
 
 
 # detailed database query
 
-def query_tables_generic_(table_name, columns_filters,columns_entities,columns_distinct):
+def query_tables_all(table_name):
+    full_values = []
 
+    if (table_name == "tool"):
+        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
+         Tool.query.all()]
+
+    elif (table_name == "role"):
+        [full_values.append(
+            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
+         Role.query.all()]
+
+    elif (table_name == "role_tool"):
+        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in Role_Tool.query.all()]
+
+    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
+        [full_values.append(
+            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
+             'country_code': q.country_code}) for q in Tool_AD.query.all()]
+
+    elif (table_name == "country"):
+        [full_values.append(
+            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
+         Country.query.all()]
+
+    else:
+        return jsonify({"message": "table selected not available"})
+        pass
+
+    json_full_values = jsonify(full_values)
+    # print(json_full_values)
+
+    return json_full_values
+
+def query_tables_filtered(table_name, columns_filters):
     full_values = []
     filters = []
-    entities = []
-    distinct = []
+
+    for item in columns_filters:
+        key = list(item.keys())[0]
+        value = list(item.values())[0]
+
 
     if (table_name == "tool"):
         # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
@@ -158,25 +200,10 @@ def query_tables_generic_(table_name, columns_filters,columns_entities,columns_d
 
     elif (table_name == "role"):
         # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
-        if columns_filters is not None:
-            [filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0])) for item in columns_filters]
-            # for item in columns_filters:
-            #     filters.append(getattr(getattr(sys.modules[__name__], "Role"), list(item.keys())[0]) == (list(item.values())[0]))
+        for item in columns_filters:
+            filters.append(getattr(Role, list(item.keys())[0]) == (list(item.values())[0]))
 
-        if columns_entities is not None:
-            [entities.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_entities]
-            # for item in columns_entities:
-            #     entities.append(getattr(getattr(sys.modules[__name__], "Role"),item))
-
-        if columns_distinct is not None:
-            [distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item)) for item in columns_distinct]
-            # for item in columns_distinct:
-            #     distinct.append(getattr(getattr(sys.modules[__name__], "Role"), item))
-
-
-        # que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
-        que = getattr(sys.modules[__name__], "Role").query.filter(and_(*filters)).distinct(
-            *distinct)
+        que = Role.query.filter(and_(*filters))
         # que = Role.query.filter(getattr(Role, key) == value)
         [full_values.append(
             {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
@@ -210,50 +237,68 @@ def query_tables_generic_(table_name, columns_filters,columns_entities,columns_d
 
     return json_full_values
 
-def query_tables_generic(table_name, columns_filters,columns_entities,columns_distinct):
-    # to add: verify if the table exist to avoid errors
-
-    # parameters for the queries
-    full_values= []
-    filters= []
-    entities= []
+def query_tables_filtered_entities_distinct(table_name, columns_filters,column_entities,column_distinct):
+    full_values = []
+    filters = []
+    entities = []
     distinct = []
 
-    if columns_filters is not None:
-        [filters.append(
-            getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0])) for item
-         in columns_filters]
+    for item in columns_filters:
+        key = list(item.keys())[0]
+        value = list(item.values())[0]
 
-    if columns_entities is not None:
-        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_entities]
 
-    if columns_distinct is not None:
-        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_distinct]
+    if (table_name == "tool"):
+        # que = Tool.query.filter(Tool.__getattribute__(Tool,key)==value)
+        que = Tool.query.filter(getattr(Tool, key) == value)
+        [full_values.append({'tool_id': q.tool_id, 'tool_name': q.tool_name, 'tool_vendor': q.tool_vendor}) for q in
+         que]
 
-    # prepare the query
-    # the query is different based on with entities. if entities is None, the query wont select nay column
-    if columns_entities is not None:
-        que = getattr((sys.modules[__name__], table_name)).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
-        # create the output only for the entities columns
-        for q in que:
-            dict = {}
-            for ent in entities:
-                dict[str(ent)] = getattr(q,str(ent))
-            full_values.append(dict)
+    elif (table_name == "role"):
+        # que = Role.query.filter(Role.__getattribute__(Role, key) == value)
+        for item in columns_filters:
+            filters.append(getattr(Role, list(item.keys())[0]) == (list(item.values())[0]))
+
+        if column_entities is not None:
+            for item in column_entities:
+                entities.append(getattr(Role,item))
+                pass
+        if column_distinct is not None:
+            for item in column_distinct:
+                distinct.append(getattr(Role, item))
+                pass
+
+        que = Role.query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
+        # que = Role.query.filter(getattr(Role, key) == value)
+        [full_values.append(
+            {'role_id': q.role_id, 'discipline': q.discipline, 'core_role': q.core_role, 'role': q.role}) for q in
+         que]
+
+    elif (table_name == "role_tool"):
+        # que = Role_Tool.query.filter(Role_Tool.__getattribute__(Role_Tool, key) == value)
+        que = Role_Tool.query.filter(getattr(Role_Tool, key) == value)
+        [full_values.append({'role_id': q.role_id, 'tool_id': q.tool_id}) for q in que]
+
+    elif ((table_name == "tool_AD") or (table_name == "tool_ad")):
+        # que = Tool_AD.query.filter(Tool_AD.__getattribute__(Tool_AD, key) == value)
+        que = Tool_AD.query.filter(getattr(Tool_AD, key) == value)
+        [full_values.append(
+            {'tool_id': q.tool_id, 'country_id': q.country_id, 'ad_group': q.ad_group, 'tool_name': q.tool_name,
+             'country_code': q.country_code}) for q in que]
+
+    elif (table_name == "country"):
+        # que = Country.query.filter(Country.__getattribute__(Country, key) == value)
+        que = Country.query.filter(getattr(Country, key) == value)
+        [full_values.append(
+            {'country_id': q.country_id, 'country_name': q.country_name, 'country_code': q.country_code}) for q in
+                que]
+
     else:
-        que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).distinct(*distinct)
-        # create the output for all columns
-        for q in que:
-            dict = {}
-            for ent in getattr(sys.modules[__name__], table_name).columns:
-                # dict[str(ent)] = q.ent
-                dict[str(ent)] = getattr(q,str(ent))
-            full_values.append(dict)
+        return jsonify({"message": "table selected not available"})
+        pass
+
     json_full_values = jsonify(full_values)
     # print(json_full_values)
+
     return json_full_values
-
-
-
-
 

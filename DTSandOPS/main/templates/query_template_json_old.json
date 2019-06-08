@@ -2,6 +2,12 @@
 //Example of the generic query structure for the database
 //this will be used to create the json to be post to the api
 {
+  "query_type": [
+    "select_all_from_table",
+    "select_filtered",
+    "select_return",
+    "select_filtered_return"
+  ],
 
   "table_name": [
     "role",
