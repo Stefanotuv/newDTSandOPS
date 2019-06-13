@@ -98,8 +98,10 @@ def query_toolid(role_id):
     pass
 
 
-@api_db.route('/query', methods=['POST'])
-def query_generic():
+# detailed database query
+
+@api_db.route('/query_and', methods=['POST'])
+def query_main_and():
 
     # this query receive a Json to create any type of query to the db on the back-end
 
@@ -107,6 +109,11 @@ def query_generic():
     # if yes get the corresponding query from the json data if not return invalid message
 
     if request.is_json:
+
+        if request.json['query_type'] is not None:
+            query_type = request.json['query_type']
+        else:
+            query_type = None
 
         if request.json['table_name'] is not None:
             table_name = request.json['table_name']
@@ -128,16 +135,15 @@ def query_generic():
         else:
             distinct = None
 
-        return query_tables_generic(table_name, filters, output ,
+        return query_tables_generic_and(table_name, filters, output ,
                                          distinct)
+
     else:
         return "not valid json request"
 
     pass
 
-
-# detailed database query
-def query_tables_generic(table_name, columns_filters,columns_entities,columns_distinct):
+def query_tables_generic_and(table_name, columns_filters,columns_entities,columns_distinct):
     # to add: verify if the table exist to avoid errors
 
     # parameters for the queries
@@ -147,25 +153,27 @@ def query_tables_generic(table_name, columns_filters,columns_entities,columns_di
     distinct = []
 
     if columns_filters is not None:
-        [filters.append(
-            getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0])) for item
-         in columns_filters]
+        [filters.append(getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0]))
+         for item in columns_filters]
 
     if columns_entities is not None:
-        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_entities]
+        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item))
+         for item in columns_entities]
 
     if columns_distinct is not None:
-        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_distinct]
+        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item))
+         for item in columns_distinct]
 
     # prepare the query
     # the query is different based on with entities. if entities is None, the query wont select nay column
     if columns_entities is not None:
-        que = getattr((sys.modules[__name__], table_name)).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
+        que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
         # create the output only for the entities columns
         for q in que:
             dict = {}
-            for ent in entities:
-                dict[str(ent)] = getattr(q,str(ent))
+            for ent in getattr(sys.modules[__name__], table_name).columns:
+                if ent in columns_entities:
+                    dict[str(ent)] = getattr(q,str(ent))
             full_values.append(dict)
     else:
         que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).distinct(*distinct)
@@ -176,12 +184,59 @@ def query_tables_generic(table_name, columns_filters,columns_entities,columns_di
                 # dict[str(ent)] = q.ent
                 dict[str(ent)] = getattr(q,str(ent))
             full_values.append(dict)
+
     json_full_values = json.dumps(full_values)
-    # json_full_values = jsonify(full_values)
-    # print(json_full_values)
     return json_full_values
 
-def query_tables_generic_list(table_name, columns_filters,columns_entities,columns_distinct):
+@api_db.route('/query_or', methods=['POST'])
+def query_main_or():
+
+    # this query receive a Json to create any type of query to the db on the back-end
+
+    # test if the request is json
+    # if yes get the corresponding query from the json data if not return invalid message
+
+    if request.is_json:
+
+        if request.json['query_type'] is not None:
+            query_type = request.json['query_type']
+        else:
+            query_type = None
+
+        if request.json['table_name'] is not None:
+            table_name = request.json['table_name']
+        else:
+            table_name = None
+
+        if request.json['filters'] is not None:
+            filters = request.json['filters']
+        else:
+            filters = None
+
+        if request.json['output'] is not None:
+            output = request.json['output']
+        else:
+            output = None
+
+        if request.json['distinct'] is not None:
+            distinct = request.json['distinct']
+        else:
+            distinct = None
+
+        # if query_type == "info":
+        #     return query_tables_info(table_name)
+        # elif query_type == "generic":
+            return query_tables_generic_or(table_name, filters, output ,
+                                         distinct)
+        # else:
+        #     pass
+
+    else:
+        return "not valid json request"
+
+    pass
+
+def query_tables_generic_or(table_name, columns_filters,columns_entities,columns_distinct):
     # to add: verify if the table exist to avoid errors
 
     # parameters for the queries
@@ -191,28 +246,30 @@ def query_tables_generic_list(table_name, columns_filters,columns_entities,colum
     distinct = []
 
     if columns_filters is not None:
-        [filters.append(
-            getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0])) for item
-         in columns_filters]
+        [filters.append(getattr(getattr(sys.modules[__name__], table_name), list(item.keys())[0]) == (list(item.values())[0]))
+         for item in columns_filters]
 
     if columns_entities is not None:
-        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_entities]
+        [entities.append(getattr(getattr(sys.modules[__name__], table_name), item))
+         for item in columns_entities]
 
     if columns_distinct is not None:
-        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item)) for item in columns_distinct]
+        [distinct.append(getattr(getattr(sys.modules[__name__], table_name), item))
+         for item in columns_distinct]
 
     # prepare the query
     # the query is different based on with entities. if entities is None, the query wont select nay column
     if columns_entities is not None:
-        que = getattr((sys.modules[__name__], table_name)).query.filter(and_(*filters)).with_entities(*entities).distinct(*distinct)
+        que = getattr(sys.modules[__name__], table_name).query.filter(or_(*filters)).with_entities(*entities).distinct(*distinct)
         # create the output only for the entities columns
         for q in que:
             dict = {}
-            for ent in entities:
-                dict[str(ent)] = getattr(q,str(ent))
+            for ent in getattr(sys.modules[__name__], table_name).columns:
+                if ent in columns_entities:
+                    dict[str(ent)] = getattr(q,str(ent))
             full_values.append(dict)
     else:
-        que = getattr(sys.modules[__name__], table_name).query.filter(and_(*filters)).distinct(*distinct)
+        que = getattr(sys.modules[__name__], table_name).query.filter(or_(*filters)).distinct(*distinct)
         # create the output for all columns
         for q in que:
             dict = {}
@@ -220,12 +277,155 @@ def query_tables_generic_list(table_name, columns_filters,columns_entities,colum
                 # dict[str(ent)] = q.ent
                 dict[str(ent)] = getattr(q,str(ent))
             full_values.append(dict)
-    # return full_values
-    json_full_values = jsonify(full_values)
-    print(json_full_values)
+
+    json_full_values = json.dumps(full_values)
+    return json_full_values
+
+@api_db.route('/query_info', methods=['POST'])
+def query_info():
+    if request.is_json:
+
+        # if request.json['query_type'] is not None:
+        #     query_type = request.json['query_type']
+        # else:
+        #     query_type = None
+
+        if request.json['table_name'] is not None:
+            table_name = request.json['table_name']
+        else:
+            table_name = None
+
+        return query_tables_info(table_name)
+
+def query_tables_info(table_name):
+    # to add: verify if the table exist to avoid errors
+
+    # prepare the query
+    # the query is different based on with entities. if entities is None, the query wont select nay column
+
+    que = (getattr(sys.modules[__name__], table_name)).columns
+    # que = Tool.columns
+
+    json_full_values = json.dumps(que)
     return json_full_values
 
 
+@api_db.route('/db_connect', methods=['POST'])
+def db_connect():
+
+    if request.is_json:
+
+        if request.json['db_type'] is not None:
+            db_type = request.json['db_type']
+        else:
+            db_type = None
+
+        if request.json['host'] is not None:
+            host = request.json['host']
+        else:
+            host = None
+
+        if request.json['port'] is not None:
+            port = request.json['port']
+        else:
+            port = None
+
+        if request.json['db_name'] is not None:
+            db_name = request.json['db_name']
+        else:
+            db_name = None
+
+        if request.json['user'] is not None:
+            user = request.json['user']
+        else:
+            user = None
+
+        if request.json['psw'] is not None:
+            psw = request.json['psw']
+        else:
+            psw = None
+
+    return connect_to_db(db_type,host,port,db_name,user,psw)
+
+    pass
+
+def connect_to_db(db_type,host,port,db_name,user,psw):
+    if db_type == 'sqlite':
 
 
 
+    pass
+
+@api_db.route('/db_save', methods=['POST'])
+def db_save():
+    pass
+
+def save_db_connection():
+    pass
+
+@api_db.route('/db_load', methods=['POST'])
+def db_load():
+    pass
+
+def load_db_connection():
+    pass
+
+
+if db_type == 'sqlite':
+    file = request.files['filename']
+    filename = secure_filename(file.filename)
+    app.config['LOCAL_DB_FOLDER'] = LOCAL_DB_FOLDER
+    file.save(os.path.join(app.config['LOCAL_DB_FOLDER'], filename))
+    allowed = allowed_file(filename)
+    if ((filename != "") and (allowed == True)):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
+        app.config['dbtype'] = 'sqlite'
+        app.config['connected'] = True
+        # return the tables in the connected db
+        tables = check_tables()
+
+        return render_template('connected.html')
+    else:
+        app.config['dbtype'] = ''
+        app.config['connected'] = False
+
+        pass
+
+
+def connect_mysql(db_type,host,port,db_name,user,psw):
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'. \
+        format(user, psw, \
+               host, port,
+               db_name)
+    app.config['dbtype'] = 'mysql'
+    app.config['connected'] = True
+
+        tables = check_tables()
+
+        # return render_template('connected.html')
+    else:
+        app.config['dbtype'] = ''
+        app.config['connected'] = False
+elif db_type == 'mongo':
+    if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "") \
+            and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (
+                    settingsMysqlMongoForm.password.data != "")):
+        # location fo the db, dbname, user and password to be passed as parameter
+
+        app.config['MONGOALCHEMY_DATABASE'] = settingsMysqlMongoForm.db_name.data
+        app.config['MONGOALCHEMY_SERVER'] = settingsMysqlMongoForm.host.data
+        app.config['MONGOALCHEMY_PORT'] = settingsMysqlMongoForm.port.data
+        app.config['MONGOALCHEMY_USER'] = settingsMysqlMongoForm.user_name.data
+        app.config['MONGOALCHEMY_PASSWORD'] = settingsMysqlMongoForm.password.data
+        app.config['dbtype'] = 'mongo'
+        app.config['connected'] = True
+        return render_template('connected.html')
+    else:
+        app.config['dbtype'] = ''
+        app.config['connected'] = False
+elif db_type == 'postgress':
+    pass
+else:
+    # error?
+    pass

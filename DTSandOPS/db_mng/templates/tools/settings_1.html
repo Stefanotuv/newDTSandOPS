@@ -1,7 +1,22 @@
 <script>
 
 
-    function selected_db(){}
+    function change_dblite(){
+        var filename_selected = document.getElementById("filename");
+
+        var existing_db_sqlite_selected = document.getElementById("existing_db_sqlite");
+        var filename = filename_selected;
+        var existing_db_sqlite = existing_db_sqlite_selected;
+        debugger;
+        if (existing_db_sqlite.value != 'New Connection'){
+            filename.setAttribute("type","hidden");
+        }
+
+        else {
+            filename.setAttribute("type","file");
+        }
+
+    }
 
     function change_db_type() {
         var db_type_selected = document.getElementById("db_type");
@@ -167,7 +182,7 @@
                 <div class="form-field">
                         <div class="select-wrap">
                             <div class="icon">
-                                {{ formSqlite.existing_db(id= 'existing_db_sqlite',class="form-control", placeholder="existing_db", style="display:None") }}
+                                {{ formSqlite.existing_db(id= 'existing_db_sqlite',class="form-control", placeholder="existing_db", style="display:None", onchange ="change_dblite()") }}
                             </div>
                         </div>
                 </div>
@@ -185,7 +200,8 @@
                         </div>
                 </div>
             </div>
-            <input class="form-control" type="test connection" value="test">
-            <input class="form-control" type="save connection" value="save">
+            <button class="form-control" type="test connection" value="test">test connection</button>
+            <p></p>
+            <button class="form-control" type="save connection" value="save">save connection</button>
         </form>
 

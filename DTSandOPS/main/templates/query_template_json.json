@@ -3,6 +3,12 @@
 //this will be used to create the json to be post to the api
 {
 
+  "query_type": [
+    "info",
+    "generic",
+    "insert"
+  ],
+
   "table_name": [
     "role",
     "tool",

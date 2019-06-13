@@ -1,11 +1,11 @@
 __author__ = "stefanotuv"
 
 from flask import request, render_template, jsonify, Blueprint, url_for, redirect
-# from DTSandOPS.main.models.role import Role
-# from DTSandOPS.main.models.role_tool import Role_Tool
-# from DTSandOPS.main.models.tool_ad import Tool_AD
-# from DTSandOPS.main.models.tool import Tool
-# from DTSandOPS.main.models.country import Country
+from DTSandOPS.main.models.role import Role
+from DTSandOPS.main.models.role_tool import Role_Tool
+from DTSandOPS.main.models.tool_ad import Tool_AD
+from DTSandOPS.main.models.tool import Tool
+from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.forms import RoleSelectionForm, UserForm
 from DTSandOPS.api.views import *
 from flask import current_app as app
@@ -28,12 +28,8 @@ def main_page():
     role_selection_form = RoleSelectionForm()
     user_form = UserForm()
     json_user_table = '' # used to save the data for user when there is a new post from the main page
-
-    filters=None
-    output=None
-    distinct=None
-    query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Tool", filters=filters, output=output, distinct=distinct)
-    full_tool_values = [item for item in query]
+    query_result = send_query_post("http://127.0.0.1:5000/api/query", "Tool", filters=None, output=None, distinct=None)
+    full_tool_values = [q for q in query_result]
 
     full_tool_array = []
     [full_tool_array.append({'id': tool['tool_id'], 'name': tool['tool_name'], 'vendor': tool['tool_vendor']}) \
@@ -50,109 +46,74 @@ def main_page():
         json_user_table = Json_users_data_reduced(Json_users_data)
 
         # use the many to many table to get all tool values corresponding the role id selected
+        roleId = query_roleid(value_selected[1],value_selected[2],value_selected[3])
+        toolsIds = query_toolid(roleId[0])
+        tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
 
         filters = [{'discipline':value_selected[1]},{'core_role':value_selected[2]},{'role':value_selected[3]}]
         output = ['role_id']
-        distinct = None
-        role_Id = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
+        role_Id = send_query_post("http://127.0.0.1:5000/api/query", "Role", filters=filters, output=output, distinct=None)
 
         filters = role_Id
         output = ['tool_id']
-        distinct = None
-        tools_Ids = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role_Tool", filters=filters, output=output, distinct=distinct)
+        tools_Ids = send_query_post("http://127.0.0.1:5000/api/query", "Role_Tool", filters=filters, output=output, distinct=None)
 
         filters = tools_Ids
         output = None
-        distinct = None
-        tool_values = send_query_post("http://127.0.0.1:5000/api/query_or", query_type= "generic", table_name="Tool", filters=filters, output=output, distinct=distinct)
+        tool_values_ = send_query_post("http://127.0.0.1:5000/api/query", "Tool", filters=filters, output=output, distinct=None)
 
-        column_name = send_query_post("http://127.0.0.1:5000/api/query_info", "info", "Tool")
+        column_name = Tool.columns
 
-        tool_array = tool_values
-        # [tool_array.append({'tool_id': tool['tool_id'], 'tool_name': tool['tool_name'], 'tool_vendor': tool['tool_vendor'] })\
-        #                     for tool in tool_values]
-        # [tool_array.append({'id': tool['tool_id'], 'name': tool['tool_name'], 'vendor': tool['tool_vendor'] })\
-        #                     for tool in tool_values]
+        tool_array = []
+        [tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor })\
+                            for tool in tool_values]
 
         jsondata = {'column_name': column_name, 'tools': tool_array, 'full_tools': full_tool_array, 'selected': value_selected[1:] }
 
-        # ------ start populate the filters/ choice-menu ------------ #
-        # filters/ choice-menu are populated based on the selections from the POST form
+        # role_selection_form.discipline.choices = query_discipline()
+        # role_selection_form.core_role.choices = query_macro_role(value_selected[1])
+        # role_selection_form.role.choices = query_role(value_selected[1], value_selected[2])
+        # user_form.country.choices = query_countries()
+
         filters = ""
         output = ['discipline']
         distinct = ['discipline']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
+        query = send_query_post("http://127.0.0.1:5000/api/query", "Role", filters=filters, output=output, distinct=distinct)
         role_selection_form.discipline.choices = [(item['discipline'],item['discipline']) for item in query]
 
         filters = [{'discipline':value_selected[1]}]
         output = ['core_role']
         distinct = ['core_role']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
+        query = send_query_post("http://127.0.0.1:5000/api/query", "Role", filters=filters, output=output, distinct=distinct)
         role_selection_form.core_role.choices = [(item['core_role'], item['core_role']) for item in query]
 
         filters = [{'discipline':value_selected[1]},{'core_role':value_selected[2]}]
         output = ['role']
         distinct = ['role']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
+        query = send_query_post("http://127.0.0.1:5000/api/query", "Role", filters=filters, output=output, distinct=distinct)
         role_selection_form.role.choices = [(item['role'], item['role']) for item in query]
 
-        filters = None
+        filters = ""
         output = ['country_code']
         distinct = None
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Country", filters=filters, output=output, distinct=distinct)
+        query = send_query_post("http://127.0.0.1:5000/api/query", "Country", filters=filters, output=output, distinct=distinct)
         user_form.country.choices = [(item['country_code'], item['country_code']) for item in query]
-        # ------ end populate the filters/ choice-menu ------------ #
 
     else:
-
-        # ------ start populate the filters/ choice-menu ------------ #
-        # filters/ choice-menu are populated with default values (D1,MR1)
-        filters = None
-        output = ['discipline']
-        distinct = ['discipline']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
-        role_selection_form.discipline.choices = [(item['discipline'],item['discipline']) for item in query]
-
-        filters = [{'discipline':role_selection_form.discipline.choices[0][0]}]
-        output = ['core_role']
-        distinct = ['core_role']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
-        role_selection_form.core_role.choices = [(item['core_role'], item['core_role']) for item in query]
-
-        filters = [{'discipline':role_selection_form.discipline.choices[0][0]},{'core_role':role_selection_form.core_role.choices[0][0]}]
-        output = ['role']
-        distinct = ['role']
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Role", filters=filters, output=output, distinct=distinct)
-        role_selection_form.role.choices = [(item['role'], item['role']) for item in query]
-
-        filters = None
-        output = ['country_code']
-        distinct = None
-        query = send_query_post("http://127.0.0.1:5000/api/query_and", query_type= "generic", table_name="Country", filters=filters, output=output, distinct=distinct)
-        user_form.country.choices = [(item['country_code'], item['country_code']) for item in query]
-        # ------ end populate the filters/ choice-menu ------------ #
-
-
+        # load the value for the menu to select the role
+        role_selection_form.discipline.choices = query_discipline()
+        role_selection_form.core_role.choices = query_macro_role(role_selection_form.discipline.choices[0][0])
+        role_selection_form.role.choices = query_role(role_selection_form.discipline.choices[0][0], role_selection_form.core_role.choices[0][0])
+        user_form.country.choices = query_countries()
 
         # add the initial values to the table --------------------------------------------
-        filters = [{'role_id':1}]
-        output = ['tool_id']
-        distinct = None
-        toolsIds_ = send_query_post("http://127.0.0.1:5000/api/query_and", query_type="generic", table_name="Role_Tool",
-                                      filters=filters, output=output, distinct=distinct)
-        filters = toolsIds_
-        output = None
-        distinct = None
-        tool_values = send_query_post("http://127.0.0.1:5000/api/query_or", query_type="generic", table_name="Tool",
-                                      filters=filters, output=output, distinct=distinct)
+        toolsIds = query_toolid(1)
 
-        column_name = column_name = send_query_post("http://127.0.0.1:5000/api/query_info", "info", "Tool")
-        tool_array = tool_values
-        # [tool_array.append({'tool_id': tool['tool_id'], 'tool_name': tool['tool_name'], 'tool_vendor': tool['tool_vendor'] })\
-        #                     for tool in tool_values]
-        # [tool_array.append({'id': tool['tool_id'], 'name': tool['tool_name'], 'vendor': tool['tool_vendor'] })\
-        #                     for tool in tool_values]
-
+        tool_values = [q for q in Tool.query.filter(Tool.tool_id.in_(toolsIds))]
+        column_name = Tool.columns
+        tool_array = []
+        [tool_array.append({'id': tool.tool_id, 'name': tool.tool_name, 'vendor': tool.tool_vendor })\
+                            for tool in tool_values]
         jsondata = {'column_name': column_name, 'tools': tool_array, 'full_tools': full_tool_array, 'selected': [] }
 
     return render_template('main_page_new_11.html', form = role_selection_form, user_form=user_form, jsondata=jsondata, json_user_table= json_user_table)
@@ -198,9 +159,6 @@ def tool_AD_for_country(tool,country):
 
     tool_ad_array = []
     [tool_ad_array.append({'ad_group': ad.ad_group}) for ad in tool_ad]
-
-    if(tool_ad_array == []):
-        tool_ad_array.append({'ad_group': "not-available"})
 
     print(jsonify({'ad_group': tool_ad_array}))
     return jsonify({'ad_group': tool_ad_array})
@@ -256,12 +214,9 @@ def Json_users_data_reduced(Json_data_list):
     return Json_reduced
 
 
-def send_query_post(api_address, query_type, table_name, filters=None, output=None, distinct=None):
+def send_query_post(api_address,table_name, filters=None, output=None, distinct=None):
 
     json_query = {
-
-        # options: info, generic
-        "query_type": query_type,
 
         # options: roles, tools, roles_tools, tool_ad, countries
         "table_name": table_name,
@@ -287,11 +242,7 @@ def testapi():
     # return create_query_post("http://127.0.0.1:5000/api/query","select_all_from_table","tool")
     # return create_query_post("http://127.0.0.1:5000/api/query","select_filtered_return","role",
     #                          [{"discipline":"D1"},{"core_role":"MR1"}],["role"],["role"])
-    # return jsonify(send_query_post("http://127.0.0.1:5000/api/query", "generic","Role",
-    #                          [{"discipline": "D1"}, {"core_role": "MR1"}]))
-
-    # return jsonify(send_query_post("http://127.0.0.1:5000/api/query", "info","Tool"))
-
-    return jsonify(send_query_post("http://127.0.0.1:5000/api/query_info", "info","Tool"))
+    return jsonify(send_query_post("http://127.0.0.1:5000/api/query", "Role",
+                             [{"discipline": "D1"}, {"core_role": "MR1"}]))
 
 

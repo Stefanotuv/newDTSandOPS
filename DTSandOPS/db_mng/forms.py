@@ -27,7 +27,7 @@ class SettingsMysqlMongoForm(FlaskForm):
     def __init__(self):
         # use a local json file where to save the connection details once they are successful
         super().__init__()
-        self.existing_db.choices = [('Create New', 'Create New'),('Upload','Upload')]
+        self.existing_db.choices = [('Create New', 'Create New'),('Connect Existing','Connect Existing')]
         pass
 
     def save_config(self):

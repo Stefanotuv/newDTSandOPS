@@ -4,6 +4,7 @@ __author__ = "stefanotuv"
 from flask import request, render_template, jsonify, Blueprint
 from DTSandOPS.db_mng.forms import SettingsDatabaseForm, SettingsMysqlMongoForm, SettingsSqliteForm
 from flask import current_app as app
+import requests
 
 from werkzeug import secure_filename
 from DTSandOPS.utilities.global_variable import *
@@ -94,17 +95,19 @@ def connect():
         else:
             # error?
             pass
-
+        return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm,
+                           formSqlite=settingsSqliteForm, jsondata=jsondata)
     else:
         return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, jsondata=jsondata)
         pass
 
-    return render_template('config.html', formDB=settingsDBForm, formMysqlMongo=settingsMysqlMongoForm, formSqlite=settingsSqliteForm, jsondata=jsondata)
+
 
 @db_mng.route('/check_connection')
 # check if the connection is active
 # connections apply only for
 def check_connection():
+
     pass
 
 @db_mng.route('/check_tables')
@@ -120,3 +123,27 @@ def Json_users_data_reduced(Json_data_list):
     [Json_reduced.append({'id' : 'id', 'user_id': Json_data['user_id'], 'role': Json_data['role'], 'country': Json_data['country']}) for Json_data in Json_data_list]
 
     return Json_reduced
+
+
+def send_connect_data_post(api_address, db_type, host, port=None, db_name=None, user=None, psw=None):
+
+    json_query = {
+
+        # options: info, generic
+        "db_type": db_type,
+
+        "host": host,
+
+        "port": port,
+
+        "db_name": db_name,
+
+        "user": user,
+
+        "psw" : psw
+    }
+
+    resp =  requests.post(api_address, json=json_query)
+    return resp.json()
+
+
