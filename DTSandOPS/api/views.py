@@ -6,7 +6,10 @@ from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.models.role import Role
 from sqlalchemy.sql.expression import or_, and_
-import sys
+from DTSandOPS.utilities.global_variable import *
+from werkzeug import secure_filename
+from flask import current_app as app
+import sys, os
 import json
 
 from flask import Blueprint, jsonify, request
@@ -345,12 +348,31 @@ def db_connect():
         else:
             psw = None
 
-    return connect_to_db(db_type,host,port,db_name,user,psw)
+        if request.json['filename'] is not None:
+            filename = request.json['filename']
+        else:
+            filename = None
+
+    return connect_to_db(db_type,host,port,db_name,user,psw, filename)
 
     pass
 
-def connect_to_db(db_type,host,port,db_name,user,psw):
+def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     if db_type == 'sqlite':
+        connect_sqlite(filename)
+    elif db_type == 'mysql':
+        connect_mysql(host,port,db_name,user,psw)
+
+    elif db_type == 'mongo':
+        connect_mongo(host,port,db_name,user,psw)
+
+    elif db_type == 'postgress':
+        pass
+    else:
+        # error?
+        pass
+
+
 
 
 
@@ -370,8 +392,9 @@ def db_load():
 def load_db_connection():
     pass
 
+def connect_sqlite(filename):
 
-if db_type == 'sqlite':
+
     file = request.files['filename']
     filename = secure_filename(file.filename)
     app.config['LOCAL_DB_FOLDER'] = LOCAL_DB_FOLDER
@@ -382,17 +405,12 @@ if db_type == 'sqlite':
         app.config['dbtype'] = 'sqlite'
         app.config['connected'] = True
         # return the tables in the connected db
-        tables = check_tables()
-
-        return render_template('connected.html')
-    else:
-        app.config['dbtype'] = ''
-        app.config['connected'] = False
-
-        pass
 
 
-def connect_mysql(db_type,host,port,db_name,user,psw):
+    return True
+
+
+def connect_mysql(host,port,db_name,user,psw):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'. \
         format(user, psw, \
@@ -401,31 +419,25 @@ def connect_mysql(db_type,host,port,db_name,user,psw):
     app.config['dbtype'] = 'mysql'
     app.config['connected'] = True
 
-        tables = check_tables()
+    return True
 
-        # return render_template('connected.html')
-    else:
-        app.config['dbtype'] = ''
-        app.config['connected'] = False
-elif db_type == 'mongo':
-    if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "") \
-            and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (
-                    settingsMysqlMongoForm.password.data != "")):
+def connect_mongo(host,port,db_name,user,psw):
+
         # location fo the db, dbname, user and password to be passed as parameter
 
-        app.config['MONGOALCHEMY_DATABASE'] = settingsMysqlMongoForm.db_name.data
-        app.config['MONGOALCHEMY_SERVER'] = settingsMysqlMongoForm.host.data
-        app.config['MONGOALCHEMY_PORT'] = settingsMysqlMongoForm.port.data
-        app.config['MONGOALCHEMY_USER'] = settingsMysqlMongoForm.user_name.data
-        app.config['MONGOALCHEMY_PASSWORD'] = settingsMysqlMongoForm.password.data
-        app.config['dbtype'] = 'mongo'
-        app.config['connected'] = True
-        return render_template('connected.html')
-    else:
-        app.config['dbtype'] = ''
-        app.config['connected'] = False
-elif db_type == 'postgress':
-    pass
-else:
-    # error?
-    pass
+    app.config['MONGOALCHEMY_DATABASE'] = db_name
+    app.config['MONGOALCHEMY_SERVER'] = host
+    app.config['MONGOALCHEMY_PORT'] = port
+    app.config['MONGOALCHEMY_USER'] = user
+    app.config['MONGOALCHEMY_PASSWORD'] = psw
+    app.config['dbtype'] = 'mongo'
+    app.config['connected'] = True
+
+    return True
+
+
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

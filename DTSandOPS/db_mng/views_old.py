@@ -38,43 +38,58 @@ def connect():
         db_type = value_selected[1]
         jsondata ={'selected':db_type}
         if db_type == 'sqlite':
-            file = request.files['filename'] if request.files['filename'] is not None else request.files['filename']
+            file = request.files['filename']
             filename = secure_filename(file.filename)
-            created = send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='sqlite', host=None, port=None, db_name=None, user=None, psw=None,
-                                   filename=filename)
+            app.config['LOCAL_DB_FOLDER'] = LOCAL_DB_FOLDER
+            file.save(os.path.join(app.config['LOCAL_DB_FOLDER'], filename))
+            allowed = allowed_file(filename)
+            if ((filename != "") and (allowed == True)):
+                app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
+                app.config['dbtype'] = 'sqlite'
+                app.config['connected'] = True
+                # return the tables in the connected db
+                tables = check_tables()
 
-            # verify the db contains the tables
+                return render_template('connected.html')
+            else:
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
 
-            return render_template('connected.html')
-
+                pass
 
 
         elif db_type == 'mysql':
-
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
-                    user = settingsMysqlMongoForm.user_name.data
-                    psw = settingsMysqlMongoForm.password.data
-                    host = settingsMysqlMongoForm.host.data
-                    port =settingsMysqlMongoForm.port.data
-                    db_name = settingsMysqlMongoForm.db_name.data
-                    send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mysql', host=host, port=port, db_name=db_name, user=user, psw=psw,
-                                           filename=None)
-                    return render_template('connected.html')
+                # location fo the db, dbname, user and password to be passed as parameter
+                app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'.\
+                    format(settingsMysqlMongoForm.user_name.data,settingsMysqlMongoForm.password.data,\
+                           settingsMysqlMongoForm.host.data,settingsMysqlMongoForm.port.data,settingsMysqlMongoForm.db_name.data)
+                app.config['dbtype'] = 'mysql'
+                app.config['connected'] = True
 
+                tables = check_tables()
+
+                # return render_template('connected.html')
+            else:
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
         elif db_type == 'mongo':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
+            # location fo the db, dbname, user and password to be passed as parameter
 
-                user = settingsMysqlMongoForm.user_name.data
-                psw = settingsMysqlMongoForm.password.data
-                host = settingsMysqlMongoForm.host.data
-                port = settingsMysqlMongoForm.port.data
-                db_name = settingsMysqlMongoForm.db_name.data
-                send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mongo', host=host, port=port,
-                                       db_name=db_name, user=user, psw=psw,
-                                       filename=None)
+                app.config['MONGOALCHEMY_DATABASE'] = settingsMysqlMongoForm.db_name.data
+                app.config['MONGOALCHEMY_SERVER'] = settingsMysqlMongoForm.host.data
+                app.config['MONGOALCHEMY_PORT'] = settingsMysqlMongoForm.port.data
+                app.config['MONGOALCHEMY_USER'] = settingsMysqlMongoForm.user_name.data
+                app.config['MONGOALCHEMY_PASSWORD'] = settingsMysqlMongoForm.password.data
+                app.config['dbtype'] = 'mongo'
+                app.config['connected'] = True
                 return render_template('connected.html')
+            else:
+                app.config['dbtype'] = ''
+                app.config['connected'] = False
         elif db_type == 'postgress':
             pass
         else:
@@ -110,7 +125,7 @@ def Json_users_data_reduced(Json_data_list):
     return Json_reduced
 
 
-def send_connect_data_post(api_address, db_type, host, port=None, db_name=None, user=None, psw=None,filename=None):
+def send_connect_data_post(api_address, db_type, host, port=None, db_name=None, user=None, psw=None):
 
     json_query = {
 
@@ -125,9 +140,7 @@ def send_connect_data_post(api_address, db_type, host, port=None, db_name=None, 
 
         "user": user,
 
-        "psw" : psw,
-
-        "filename" : filename
+        "psw" : psw
     }
 
     resp =  requests.post(api_address, json=json_query)

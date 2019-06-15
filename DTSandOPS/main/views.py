@@ -1,17 +1,21 @@
 __author__ = "stefanotuv"
 
-from flask import request, render_template, jsonify, Blueprint, url_for, redirect
+
+# from flask import request , jsonify, Blueprint, url_for, redirect
 # from DTSandOPS.main.models.role import Role
 # from DTSandOPS.main.models.role_tool import Role_Tool
 # from DTSandOPS.main.models.tool_ad import Tool_AD
 # from DTSandOPS.main.models.tool import Tool
 # from DTSandOPS.main.models.country import Country
+# import json
+# from urllib.parse import parse_qs
+
+from flask import render_template
 from DTSandOPS.main.forms import RoleSelectionForm, UserForm
 from DTSandOPS.api.views import *
 from flask import current_app as app
 import requests
-import json
-from urllib.parse import parse_qs
+
 
 
 from DTSandOPS.utilities.global_variable import *
