@@ -94,7 +94,7 @@ def connect():
 # check if the connection is active
 # connections apply only for
 def check_connection():
-    db
+
     pass
 
 @db_mng.route('/check_tables')
