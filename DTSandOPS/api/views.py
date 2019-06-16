@@ -11,6 +11,7 @@ from werkzeug import secure_filename
 from flask import current_app as app
 import sys, os
 import json
+from DTSandOPS.db_mng.views import db_mng
 
 from flask import Blueprint, jsonify, request
 
@@ -363,6 +364,7 @@ def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     elif db_type == 'mysql':
         connect_mysql(host,port,db_name,user,psw)
 
+
     elif db_type == 'mongo':
         connect_mongo(host,port,db_name,user,psw)
 
@@ -371,9 +373,10 @@ def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     else:
         # error?
         pass
+    return 'true'
 
-
-
+def check_db():
+    # check if the db and the tables exist otherwise return an error
 
 
     pass
@@ -407,7 +410,7 @@ def connect_sqlite(filename):
         # return the tables in the connected db
 
 
-    return True
+    return 'True'
 
 
 def connect_mysql(host,port,db_name,user,psw):
@@ -418,8 +421,7 @@ def connect_mysql(host,port,db_name,user,psw):
                db_name)
     app.config['dbtype'] = 'mysql'
     app.config['connected'] = True
-
-    return True
+    return 'True'
 
 def connect_mongo(host,port,db_name,user,psw):
 
@@ -433,7 +435,7 @@ def connect_mongo(host,port,db_name,user,psw):
     app.config['dbtype'] = 'mongo'
     app.config['connected'] = True
 
-    return True
+    return 'True'
 
 
 

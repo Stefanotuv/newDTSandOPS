@@ -20,6 +20,7 @@ def create_app(config_class=Config):
     app.config['user_table'] = ''
     app.config['dbtype'] = ''
     app.config['connected'] = False
+    app.config['SECRET_KEY'] = 'stefanotuv'
 
     db.init_app(app)
     bcrypt.init_app(app)

@@ -60,6 +60,8 @@ def connect():
                     db_name = settingsMysqlMongoForm.db_name.data
                     send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mysql', host=host, port=port, db_name=db_name, user=user, psw=psw,
                                            filename=None)
+                    check_connection
+
                     return render_template('connected.html')
 
         elif db_type == 'mongo':
@@ -92,7 +94,7 @@ def connect():
 # check if the connection is active
 # connections apply only for
 def check_connection():
-
+    db
     pass
 
 @db_mng.route('/check_tables')
