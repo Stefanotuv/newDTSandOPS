@@ -12,6 +12,9 @@ from flask import current_app as app
 import sys, os
 import json
 from DTSandOPS.db_mng.views import db_mng
+from sqlalchemy_utils import database_exists
+from DTSandOPS import db
+
 
 from flask import Blueprint, jsonify, request
 
@@ -360,20 +363,22 @@ def db_connect():
 
 def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     if db_type == 'sqlite':
-        connect_sqlite(filename)
+        value = set_sqlite(filename)
+
     elif db_type == 'mysql':
-        connect_mysql(host,port,db_name,user,psw)
+        value = set_mysql(host,port,db_name,user,psw)
+        # db_exist =
 
 
     elif db_type == 'mongo':
-        connect_mongo(host,port,db_name,user,psw)
+        value = set_mongo(host,port,db_name,user,psw)
 
     elif db_type == 'postgress':
         pass
     else:
         # error?
         pass
-    return 'true'
+    return value
 
 def check_db():
     # check if the db and the tables exist otherwise return an error
@@ -395,7 +400,7 @@ def db_load():
 def load_db_connection():
     pass
 
-def connect_sqlite(filename):
+def set_sqlite(filename):
 
 
     file = request.files['filename']
@@ -406,6 +411,7 @@ def connect_sqlite(filename):
     if ((filename != "") and (allowed == True)):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.config['LOCAL_DB_FOLDER'], filename)
         app.config['dbtype'] = 'sqlite'
+
         app.config['connected'] = True
         # return the tables in the connected db
 
@@ -413,17 +419,23 @@ def connect_sqlite(filename):
     return 'True'
 
 
-def connect_mysql(host,port,db_name,user,psw):
+def set_mysql(host,port,db_name,user,psw):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'. \
         format(user, psw, \
                host, port,
                db_name)
     app.config['dbtype'] = 'mysql'
-    app.config['connected'] = True
-    return 'True'
 
-def connect_mongo(host,port,db_name,user,psw):
+    if database_exists(db.engine.url):
+        app.config['connected'] = True
+        return 'true'
+    else:
+        app.config['connected'] = False
+        return 'false'
+
+
+def set_mongo(host,port,db_name,user,psw):
 
         # location fo the db, dbname, user and password to be passed as parameter
 

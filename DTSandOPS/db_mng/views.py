@@ -5,12 +5,12 @@ from flask import request, render_template, jsonify, Blueprint
 from DTSandOPS.db_mng.forms import SettingsDatabaseForm, SettingsMysqlMongoForm, SettingsSqliteForm
 from flask import current_app as app
 import requests
-
+from sqlalchemy_utils import database_exists
 from werkzeug import secure_filename
 from DTSandOPS.utilities.global_variable import *
 from DTSandOPS.db_mng.utilities.local_variables import *
 from DTSandOPS import db
-
+# from flask_sqlalchemy import database_exists
 
 db_mng = Blueprint('db_mng', __name__, template_folder='templates', url_prefix='/db')
 
@@ -54,13 +54,16 @@ def connect():
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
                     user = settingsMysqlMongoForm.user_name.data
+
                     psw = settingsMysqlMongoForm.password.data
                     host = settingsMysqlMongoForm.host.data
                     port =settingsMysqlMongoForm.port.data
                     db_name = settingsMysqlMongoForm.db_name.data
                     send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mysql', host=host, port=port, db_name=db_name, user=user, psw=psw,
                                            filename=None)
-                    check_connection
+
+
+
 
                     return render_template('connected.html')
 
@@ -94,6 +97,10 @@ def connect():
 # check if the connection is active
 # connections apply only for
 def check_connection():
+
+    if database_exists(db.engine.url):
+        pass
+
 
     pass
 

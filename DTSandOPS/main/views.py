@@ -29,6 +29,8 @@ def allowed_file(filename):
 
 @main.route('/main_page', methods = ['GET', 'POST'])
 def main_page():
+
+
     role_selection_form = RoleSelectionForm()
     user_form = UserForm()
     json_user_table = '' # used to save the data for user when there is a new post from the main page
