@@ -59,13 +59,16 @@ def connect():
                     host = settingsMysqlMongoForm.host.data
                     port =settingsMysqlMongoForm.port.data
                     db_name = settingsMysqlMongoForm.db_name.data
-                    send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mysql', host=host, port=port, db_name=db_name, user=user, psw=psw,
+                    value = send_connect_data_post("http://127.0.0.1:5000/api/db_connect", db_type='mysql', host=host, port=port, db_name=db_name, user=user, psw=psw,
                                            filename=None)
 
 
+                    if value:
+                        return render_template('connected.html')
+                    else:
+                        return render_template('No-connected.html')
 
 
-                    return render_template('connected.html')
 
         elif db_type == 'mongo':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
