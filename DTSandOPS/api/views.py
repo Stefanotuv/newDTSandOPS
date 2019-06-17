@@ -434,6 +434,7 @@ def set_mysql(host,port,db_name,user,psw):
         app.config['connected'] = False
         return 'false'
 
+    return 'false'
 
 def set_mongo(host,port,db_name,user,psw):
 
