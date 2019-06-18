@@ -366,7 +366,7 @@ def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     elif db_type == 'mysql':
         db_exist = set_mysql(host,port,db_name,user,psw)
         value = 'false'
-        if db_exist:
+        if db_exist == 'true':
             tables_exist = db.engine.table_names()
             table_list = TABLE_LIST
             value = 'false'

@@ -63,7 +63,7 @@ def connect():
                                            filename=None)
 
 
-                    if value:
+                    if value == 'true':
                         return render_template('connected.html')
                     else:
                         return render_template('No-connected.html')
