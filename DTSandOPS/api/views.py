@@ -13,6 +13,7 @@ import sys, os
 import json
 from DTSandOPS.db_mng.views import db_mng
 from sqlalchemy_utils import database_exists
+from sqlalchemy import *
 from DTSandOPS import db
 
 
@@ -90,7 +91,6 @@ def query_countries():
     pass
 
 @api_db.route('/query/roleid/<discipline>/<core_role>/<role>', methods=['GET'])
-
 def query_roleid(discipline, core_role, role):
     query = [ q.role_id for q in Role.query.filter_by(discipline=discipline,core_role = core_role, role = role).with_entities(Role.role_id)]
     return query
@@ -98,7 +98,6 @@ def query_roleid(discipline, core_role, role):
 
 # toolsIds
 @api_db.route('/query/tool_id/<role_id>', methods=['GET'])
-
 def query_toolid(role_id):
     query = [q.tool_id for q in Role_Tool.query.filter_by(role_id=role_id).with_entities(Role_Tool.tool_id)]
     return query
@@ -106,7 +105,6 @@ def query_toolid(role_id):
 
 
 # detailed database query
-
 @api_db.route('/query_and', methods=['POST'])
 def query_main_and():
 
@@ -363,22 +361,25 @@ def db_connect():
 
 def connect_to_db(db_type,host,port,db_name,user,psw,filename):
     if db_type == 'sqlite':
-        value = set_sqlite(filename)
+        db_exist = set_sqlite(filename)
 
     elif db_type == 'mysql':
-        value = set_mysql(host,port,db_name,user,psw)
-        # db_exist =
+        db_exist = set_mysql(host,port,db_name,user,psw)
+        if db_exist:
+            tables_exist = MetaData().tables.keys()
+        else:
+            return db_exist
 
 
     elif db_type == 'mongo':
-        value = set_mongo(host,port,db_name,user,psw)
+        db_exist = set_mongo(host,port,db_name,user,psw)
 
     elif db_type == 'postgress':
         pass
     else:
         # error?
         pass
-    return value
+    return db_exist
 
 def check_db():
     # check if the db and the tables exist otherwise return an error
