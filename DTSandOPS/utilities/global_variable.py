@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.abspath('../tests_templates')
 STATIC_DIR = os.path.abspath('../static')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','xls','xlsx'])
+TABLE_LIST = ['Countries', 'Roles', 'Roles_Tools', 'Tool_AD', 'Tools', 'User']
 UPLOAD_FOLDER = os.path.abspath('../static/data_import')
 # LOCAL_DB_FOLDER = os.path.abspath('../static/db_local')
 UPLOAD_INITIATE_FOLDER = os.path.abspath('../../static/data_import')

@@ -365,10 +365,19 @@ def connect_to_db(db_type,host,port,db_name,user,psw,filename):
 
     elif db_type == 'mysql':
         db_exist = set_mysql(host,port,db_name,user,psw)
+        value = 'false'
         if db_exist:
-            tables_exist = MetaData().tables.keys()
+            tables_exist = db.engine.table_names()
+            table_list = TABLE_LIST
+            value = 'false'
+            for item in table_list:
+                value = 'true' # required as the list can be empty
+                if item in tables_exist:
+                    pass
+                else:
+                    value='false' # if any of table is not present
         else:
-            return db_exist
+            return value
 
 
     elif db_type == 'mongo':
