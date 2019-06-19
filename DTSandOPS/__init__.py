@@ -5,12 +5,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from DTSandOPS.config import Config
+from DTSandOPS.utilities.global_variable import *
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 login = LoginManager()
 login.login_view = 'login'
 login.login_message_category = 'info'
+
 
 # from DTSandOPS import views
 
@@ -21,6 +23,8 @@ def create_app(config_class=Config):
     app.config['dbtype'] = ''
     app.config['connected'] = False
     app.config['SECRET_KEY'] = 'stefanotuv'
+    app.config['UPLOAD_FOLDER']= UPLOAD_FOLDER
+
 
     db.init_app(app)
     bcrypt.init_app(app)

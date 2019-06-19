@@ -5,6 +5,7 @@ from DTSandOPS.main.models.tool import Tool
 from DTSandOPS.main.models.role_tool import Role_Tool
 from DTSandOPS.main.models.country import Country
 from DTSandOPS.main.models.role import Role
+
 from sqlalchemy.sql.expression import or_, and_
 from DTSandOPS.utilities.global_variable import *
 from werkzeug import secure_filename
@@ -375,9 +376,12 @@ def connect_to_db(db_type,host,port,db_name,user,psw,filename):
                 if item in tables_exist:
                     pass
                 else:
-                    value='false' # if any of table is not present
-        else:
-            return value
+                    value = 'false' # if any of table is not present
+
+        save_db_connection()
+
+        return value
+
 
 
     elif db_type == 'mongo':
@@ -401,14 +405,41 @@ def db_save():
     pass
 
 def save_db_connection():
+    # check the file exists
+    # if the file exist import
+    # append the configuration as a standard json-file
+    load_db_connections()
+
+
+
     pass
 
 @api_db.route('/db_load', methods=['POST'])
 def db_load():
     pass
 
-def load_db_connection():
-    pass
+def load_db_connections():
+    # check if file exist
+
+    file = os.path.join(UPLOAD_INITIATE_FOLDER, DATABASE_FILE_CONNECTIONS)
+    # temp = sys.path.append(os.path.dirname(__file__))
+
+    print(file)
+    if os.path.isfile(file):
+        json_db_connection = loadjson(file)
+        pass
+    else:
+        pass
+
+    return json_db_connection
+
+def loadjson(filename):
+
+    '''read Json from file'''
+
+    with open(filename, 'r') as f:
+        json_data = json.load(f)
+    return json_data
 
 def set_sqlite(filename):
 
@@ -426,7 +457,7 @@ def set_sqlite(filename):
         # return the tables in the connected db
 
 
-    return 'True'
+    return 'true'
 
 
 def set_mysql(host,port,db_name,user,psw):
@@ -459,8 +490,6 @@ def set_mongo(host,port,db_name,user,psw):
     app.config['connected'] = True
 
     return 'True'
-
-
 
 
 def allowed_file(filename):

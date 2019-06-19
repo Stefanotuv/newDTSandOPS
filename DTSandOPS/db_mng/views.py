@@ -36,7 +36,7 @@ def connect():
         value_selected = [request.form[key] for key in keys]
 
         db_type = value_selected[1]
-        jsondata ={'selected':db_type}
+        jsondata ={'selected': db_type}
         if db_type == 'sqlite':
             file = request.files['filename'] if request.files['filename'] is not None else request.files['filename']
             filename = secure_filename(file.filename)
@@ -46,15 +46,11 @@ def connect():
             # verify the db contains the tables
 
             return render_template('connected.html')
-
-
-
         elif db_type == 'mysql':
 
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
                     user = settingsMysqlMongoForm.user_name.data
-
                     psw = settingsMysqlMongoForm.password.data
                     host = settingsMysqlMongoForm.host.data
                     port =settingsMysqlMongoForm.port.data
@@ -63,13 +59,10 @@ def connect():
                                            filename=None)
 
 
-                    if value == 'true':
+                    if value == True:
                         return render_template('connected.html')
                     else:
                         return render_template('No-connected.html')
-
-
-
         elif db_type == 'mongo':
             if ((settingsMysqlMongoForm.host.data != "") and (settingsMysqlMongoForm.db_name.data != "")\
                     and (settingsMysqlMongoForm.user_name.data != "") and (settingsMysqlMongoForm.port.data != "") and (settingsMysqlMongoForm.password.data != "")):
@@ -96,16 +89,8 @@ def connect():
 
 
 
-@db_mng.route('/check_connection')
-# check if the connection is active
-# connections apply only for
-def check_connection():
-
-    if database_exists(db.engine.url):
-        pass
 
 
-    pass
 
 @db_mng.route('/check_tables')
 # check if the table exist in the db
