@@ -12,6 +12,7 @@ from werkzeug import secure_filename
 from flask import current_app as app
 import sys, os
 import json
+from flask import jsonify
 from DTSandOPS.db_mng.views import db_mng
 from sqlalchemy_utils import database_exists
 from sqlalchemy import *
@@ -414,15 +415,30 @@ def save_db_connection():
 
     pass
 
-@api_db.route('/db_load', methods=['POST'])
-def db_load():
-    pass
+@api_db.route('/db_load/<db_type>', methods=['GET','POST'])
+def db_load(db_type):
+    json_data = load_db_connections()
+
+    if db_type == 'mongo':
+        jreturn = jsonify(json_data['mongo'])
+    elif db_type =='mysql':
+        jreturn = jsonify(json_data['mysql'])
+    else:
+        jreturn = jsonify(json_data)
+
+    return jreturn
+
+@api_db.route('/db_load', methods=['GET','POST'])
+def db_load_all():
+    json_data = load_db_connections()
+    jreturn = jsonify(json_data)
+
+    return jreturn
 
 def load_db_connections():
     # check if file exist
 
     file = os.path.join(UPLOAD_INITIATE_FOLDER, DATABASE_FILE_CONNECTIONS)
-    # temp = sys.path.append(os.path.dirname(__file__))
 
     print(file)
     if os.path.isfile(file):

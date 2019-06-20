@@ -91,6 +91,29 @@
 
 
 </script>
+
+<script>
+    function getData(){
+        return load_data_backend()
+    }
+
+            {#load the previous saved user table info#}
+        function load_data_backend(){
+            debugger;
+            theUrl = '/api/db_load/' + 'mongo';
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false );
+            xmlHttp.send( null );
+            debugger;
+            value_return = JSON.parse(xmlHttp.responseText);
+
+            return value_return
+        }
+
+
+</script>
+
+
 <div class="form-group">
     <div class="form-field">
         <div class="select-wrap">

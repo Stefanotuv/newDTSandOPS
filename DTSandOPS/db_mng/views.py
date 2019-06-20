@@ -28,6 +28,10 @@ def connect():
     settingsSqliteForm = SettingsSqliteForm()
     jsondata={}
 
+    # prepopulate forms with the datafile saved
+    value_test = send_connect_data_get("http://127.0.0.1:5000/api/db_load_all")
+
+
     if request.method == 'POST':
     # getting the information from the post to get what DB and the other
     # connectivity details
@@ -127,7 +131,11 @@ def send_connect_data_post(api_address, db_type, host, port=None, db_name=None, 
         "filename" : filename
     }
 
-    resp =  requests.post(api_address, json=json_query)
+    resp = requests.post(api_address, json=json_query)
     return resp.json()
 
+def send_connect_data_get(api_address):
 
+
+    resp = requests.get(api_address)
+    return resp.json()

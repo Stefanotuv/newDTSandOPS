@@ -1,11 +1,22 @@
-[
-  {
-    "connection_name": "default",
-    "host": "localhost",
-    "port": "3306",
-    "db_name": "test",
-    "user_name": "root",
-    "psw": ""
-  }
-
-]
+{
+  "mysql": [
+    {
+      "connection_name": "default",
+      "host": "localhost",
+      "port": "3306",
+      "db_name": "test",
+      "user_name": "root",
+      "psw": ""
+    }
+  ],
+  "mongo": [
+    {
+      "connection_name": "default",
+      "host": "localhost",
+      "port": "27017",
+      "db_name": "test",
+      "user_name": "root",
+      "psw": ""
+    }
+  ]
+}
