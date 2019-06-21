@@ -35,12 +35,18 @@ def connect():
 
     choices = settingsMysqlMongoForm.existing_db.choices
     choices_mysql = []
-    choices_mysql_selections = {}
+
     choices_mongo = []
+
+    [choices_mysql.append((item['connection_name'], item['connection_name']))
+        for item in existing_dbs['mysql']]
+    [choices_mongo.append((item['connection_name'], item['connection_name']))
+        for item in existing_dbs['mongo']]
+
+    choices_mysql_selections = {}
     choices_mongo_selections = {}
 
     for item in existing_dbs['mysql']:
-        choices_mysql.append((item['connection_name'], item['connection_name']))
         choices_mysql_selections[item['connection_name']] =  {
             'host': item['host'],
             'port': item['port'],
@@ -50,7 +56,6 @@ def connect():
         }
 
     for item in existing_dbs['mongo']:
-        choices_mongo.append((item['connection_name'], item['connection_name']))
         choices_mongo_selections[item['connection_name']] =  {
             'host': item['host'],
             'port': item['port'],
@@ -59,6 +64,8 @@ def connect():
             'psw': item['psw'],
         }
 
+    app.config['choices_mysql_selections'] = choices_mysql_selections
+    app.config['choices_mongo_selections'] = choices_mongo_selections
 
 
     settingsMysqlMongoForm.existing_db.choices = choices
