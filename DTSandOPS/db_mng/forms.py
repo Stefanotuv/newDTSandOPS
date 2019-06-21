@@ -13,7 +13,7 @@ import os
 
 
 class SettingsDatabaseForm(FlaskForm):
-    db_type = SelectField('role', choices=[])
+    db_type = SelectField('db_type', choices=[])
 
 
 class SettingsMysqlMongoForm(FlaskForm):
@@ -27,7 +27,10 @@ class SettingsMysqlMongoForm(FlaskForm):
     def __init__(self):
         # use a local json file where to save the connection details once they are successful
         super().__init__()
-        self.existing_db.choices = [('Create New', 'Create New'),('Connect Existing','Connect Existing')]
+        self.existing_db.choices = [('Create New', 'Create New')]
+        # self.existing_db.choices = [('Create New', 'Create New'), ('Connect Existing', 'Connect Existing')]
+
+
         pass
 
     def save_config(self):

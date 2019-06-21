@@ -94,20 +94,44 @@
 
 <script>
     function getData(){
-        return load_data_backend()
+        return load_data_db()
     }
 
             {#load the previous saved user table info#}
-        function load_data_backend(){
-            debugger;
-            theUrl = '/api/db_load/' + 'mongo';
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", theUrl, false );
-            xmlHttp.send( null );
-            debugger;
-            value_return = JSON.parse(xmlHttp.responseText);
+        function load_data_db(){
+            var db_type_selected = document.getElementById("db_type");
+            var existing_db_mysql_mongo_selected = document.getElementById("existing_db_mysql_mongo");
+            var host_selected = document.getElementById("host");
+            var port_selected = document.getElementById("port");
+            var db_name_selected = document.getElementById("db_name");
+            var user_name_selected = document.getElementById("user_name");
+            var password_selected = document.getElementById("password");
+            var existing_db_sqlite_selected = document.getElementById("existing_db_sqlite");
 
-            return value_return
+            db_type = db_type_selected.value;
+            existing_db_mysql_mongo = existing_db_mysql_mongo_selected.value
+            fetch('/api/db_load/' + db_type).then(function(response) {
+
+                    response.json().then(function(data) {
+                        var optionHTML = '';
+                        debugger;
+                        for (var core_role of data.core_role) {
+                            optionHTML += '<option value="' + core_role.id + '">' + core_role.name + '</option>';
+                        }
+
+                        core_role_selected.innerHTML = optionHTML;
+
+                        var optionHTML = '';
+                        for (var role of data.role) {
+                            optionHTML += '<option value="' + role.id + '">' + role.name + '</option>';
+                        }
+
+                        role_selected.innerHTML = optionHTML;
+                    })
+
+                });
+
+        console.log("discipline");
         }
 
 
@@ -146,7 +170,7 @@
                 <div class="form-field">
                     <div class="select-wrap">
                         <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                {{ formMysqlMongo.existing_db(id= 'existing_db_mysql_mongo',class="form-control" ) }}
+                                {{ formMysqlMongo.existing_db(id= 'existing_db_mysql_mongo',class="form-control",onchange='getData()' ) }}
 
                     </div>
                 </div>

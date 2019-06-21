@@ -29,8 +29,20 @@ def connect():
     jsondata={}
 
     # prepopulate forms with the datafile saved
-    value_test = send_connect_data_get("http://127.0.0.1:5000/api/db_load_all")
+    # add the existing connetion to the DB as a list and complement with a js function
+    # to add all the other values to the once the option is selected
+    existing_dbs = send_connect_data_get("http://127.0.0.1:5000/api/db_load")
 
+    choices = settingsMysqlMongoForm.existing_db.choices
+    choices_mysql = []
+    choices_mongo = []
+
+    [choices_mysql.append((item['connection_name'],item['connection_name'])) for item in
+                      existing_dbs['mysql']]
+    [choices_mongo.append((item['connection_name'], item['connection_name'])) for item in
+                     existing_dbs['mongo']]
+
+    settingsMysqlMongoForm.existing_db.choices = choices
 
     if request.method == 'POST':
     # getting the information from the post to get what DB and the other

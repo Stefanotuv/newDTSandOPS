@@ -416,12 +416,15 @@ def save_db_connection():
     pass
 
 @api_db.route('/db_load/<db_type>', methods=['GET','POST'])
-def db_load(db_type):
+def db_load(db_type,existing_db):
     json_data = load_db_connections()
 
     if db_type == 'mongo':
+
         jreturn = jsonify(json_data['mongo'])
+
     elif db_type =='mysql':
+
         jreturn = jsonify(json_data['mysql'])
     else:
         jreturn = jsonify(json_data)
