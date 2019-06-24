@@ -3,7 +3,6 @@ __author__ = "stefanotuv"
 from DTSandOPS import db, login
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from DTSandOPS import bcrypt
 
 from flask_login import UserMixin
 
@@ -35,7 +34,7 @@ class User(UserMixin, db.Model):
 
     def set_password(self, password):
         # self.password_hash = generate_password_hash(password)
-        self.password_hash = bcrypt.generate_password_hash(password).decode('UTF-8')
+        self.password_hash = generate_password_hash(password).decode('UTF-8')
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password)

@@ -13,5 +13,3 @@ flask_sqlalchemy==2.4.0
 pymysql==0.9.3
 Requests==2.22.0
 sqlalchemy_utils==0.34.0
-cryptography==2.7
-flask_bcrypt==0.7.1

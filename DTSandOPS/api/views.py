@@ -478,7 +478,6 @@ def set_sqlite(filename):
 
     return 'true'
 
-
 def set_mysql(host,port,db_name,user,psw):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{}:{}@{}:{}/{}'. \
